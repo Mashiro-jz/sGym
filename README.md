@@ -1,3 +1,3 @@
-# agym
+# sGym
 
 A new Flutter project.
