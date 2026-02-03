@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "901188157779",
+    "project_id": "sgym-4912a",
+    "storage_bucket": "sgym-4912a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901188157779:android:c5c50d4e272ec2d754a1a6",
+        "android_client_info": {
+          "package_name": "com.example.agym"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEa6EbD9Jt2siTDZyAkeL-I7UQjgjaYl4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
