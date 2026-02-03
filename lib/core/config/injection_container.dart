@@ -1,3 +1,4 @@
+import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -24,6 +25,15 @@ Future<void> init() async {
   sl.registerFactory(() => RegisterUser(sl()));
   sl.registerFactory(() => LogoutUser(sl()));
   sl.registerFactory(() => GetCurrentUser(sl()));
+
+  sl.registerFactory(
+    () => AuthCubit(
+      loginUser: sl(),
+      getCurrentUser: sl(),
+      logoutUser: sl(),
+      registerUser: sl(),
+    ),
+  );
 
   // 2. Repository (Pośrednik)
   // Rejestrujemy jako 'LazySingleton' - jedna instancja na całe życie aplikacji.
