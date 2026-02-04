@@ -1,3 +1,4 @@
+import 'package:agym/core/enums/user_role.dart';
 import 'package:agym/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,9 @@ abstract class AuthRemoteDataSource {
   Future<void> logout();
 
   Future<UserModel?> getCurrentUser();
+
+  Future<List<UserModel>> getAllUsers();
+  Future<void> updateUserRole({required String uid, required UserRole newRole});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -79,5 +83,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } else {
       throw Exception('User not found in Firestore');
     }
+  }
+
+  @override
+  Future<List<UserModel>> getAllUsers() async {
+    final snapshot = await firebaseFirestore.collection('users').get();
+    return snapshot.docs.map((doc) {
+      return UserModel.fromJson(doc.data());
+    }).toList();
+  }
+
+  @override
+  Future<void> updateUserRole({
+    required String uid,
+    required UserRole newRole,
+  }) async {
+    // Zamieniamy np. UserRole.trainer na "trainer"
+    String roleString = newRole.toString().split('.').last;
+
+    await firebaseFirestore.collection('users').doc(uid).update({
+      'userRole': roleString,
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:agym/core/enums/user_role.dart';
 import 'package:agym/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:agym/features/auth/data/models/user_model.dart';
 import 'package:agym/features/auth/domain/entities/user.dart';
@@ -52,5 +53,19 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     return registeredModel.toEntity();
+  }
+
+  @override
+  Future<List<User>> getAllUsers() async {
+    final userModels = await authRemoteDataSource.getAllUsers();
+    return userModels.map((model) => model.toEntity()).toList();
+  }
+
+  @override
+  Future<void> updateUserRole({
+    required String uid,
+    required UserRole newRole,
+  }) async {
+    await authRemoteDataSource.updateUserRole(uid: uid, newRole: newRole);
   }
 }

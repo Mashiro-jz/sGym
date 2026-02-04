@@ -1,4 +1,4 @@
-import 'package:agym/features/auth/presentation/pages/login_page.dart';
+import 'package:agym/core/config/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,11 +33,14 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<AuthCubit>()..checkAuthStatus(),
         ),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'sGym',
         theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-        // 4. AuthGate - To jest nasza bramka decyzyjna
-        home: const AuthGate(),
+        routerConfig: appRouter, // Wstrzykujemy nasz GoRouter
+        builder: (context, child) {
+          // Główna bramka aplikacji - decyduje, co pokazać w zależności od stanu AuthCubit
+          return AuthGate(child: child!);
+        },
       ),
     );
   }
@@ -45,44 +48,24 @@ class MyApp extends StatelessWidget {
 
 // BRAMKA (Decyduje jaki ekran pokazać)
 class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+  final Widget child;
+
+  const AuthGate({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        // SYTUACJA A: Aplikacja dopiero wstała i sprawdza token w Firebase
-        if (state is AuthLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        // SYTUACJA B: Mamy użytkownika!
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        // Logika przekierowań
         if (state is Authenticated) {
-          // Tu w przyszłości wstawimy prawdziwy HomePage
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("sGym Home"),
-              actions: [
-                // Przycisk wylogowania dla testu
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  onPressed: () {
-                    context.read<AuthCubit>().logout();
-                  },
-                ),
-              ],
-            ),
-            body: Center(
-              child: Text("Witaj ${state.user.firstName}! Jesteś zalogowany."),
-            ),
-          );
+          // Jak zalogowany -> idź do Home (który jest wewnątrz ShellRoute)
+          appRouter.go('/home');
+        } else if (state is Unauthenticated) {
+          // Jak niezalogowany -> idź do Login
+          appRouter.go('/login');
         }
-
-        // SYTUACJA C: Nie ma użytkownika (Unauthenticated) lub Błąd
-        return const LoginPage();
       },
+      child: child, // Wyświetlamy to, co router akurat chce pokazać
     );
   }
 }

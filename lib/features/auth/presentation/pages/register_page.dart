@@ -143,18 +143,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       border: OutlineInputBorder(),
                     ),
                     items: SexRole.values.map((sex) {
-                      // Tutaj robimy precyzyjne tłumaczenie dla każdej opcji
                       String label = "";
                       switch (sex) {
-                        case SexRole
-                            .man: // Upewnij się, że w modelu masz .male lub .man
+                        case SexRole.man:
                           label = "Mężczyzna";
                           break;
-                        case SexRole.woman: // lub .woman
+                        case SexRole.woman:
                           label = "Kobieta";
                           break;
                         default:
-                          label = "Inna"; // Dla SexRole.other
+                          label = "Inna";
                       }
 
                       return DropdownMenuItem(value: sex, child: Text(label));

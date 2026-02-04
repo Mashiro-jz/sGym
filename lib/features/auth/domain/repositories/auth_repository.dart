@@ -1,3 +1,5 @@
+import 'package:agym/core/enums/user_role.dart';
+
 import '../entities/user.dart';
 
 // To jest klasa abstrakcyjna - czyli lista wymagań.
@@ -21,4 +23,7 @@ abstract class AuthRepository {
   // Sprawdzenie: Czy ktoś jest już zalogowany? (np. po restarcie apki)
   // Zwraca User lub null (jeśli nikt nie jest zalogowany).
   Future<User?> getCurrentUser();
+
+  Future<List<User>> getAllUsers();
+  Future<void> updateUserRole({required String uid, required UserRole newRole});
 }
