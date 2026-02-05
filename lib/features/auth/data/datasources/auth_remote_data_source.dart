@@ -99,7 +99,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required UserRole newRole,
   }) async {
     // Zamieniamy np. UserRole.trainer na "trainer"
-    String roleString = newRole.toString().split('.').last;
+    String roleString = newRole.name;
 
     await firebaseFirestore.collection('users').doc(uid).update({
       'userRole': roleString,

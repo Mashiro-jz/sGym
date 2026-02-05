@@ -2,6 +2,7 @@ import 'package:agym/core/enums/sex_role.dart';
 import 'package:agym/core/enums/user_role.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 
@@ -72,6 +73,20 @@ class ProfilePage extends StatelessWidget {
                         ? Colors.orange
                         : Colors.green,
                   ),
+
+                  if (user.userRole == UserRole.manager)
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.admin_panel_settings),
+                      label: const Text("Panel Menadżera"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Przejście do panelu admina
+                        context.push('/admin');
+                      },
+                    ),
 
                   const SizedBox(height: 30),
                   const Divider(),

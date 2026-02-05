@@ -38,5 +38,6 @@ const _$SexRoleEnumMap = {
 const _$UserRoleEnumMap = {
   UserRole.client: 'client',
   UserRole.cashier: 'cashier',
+  UserRole.trainer: 'trainer',
   UserRole.manager: 'manager',
 };

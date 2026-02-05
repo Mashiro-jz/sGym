@@ -1,3 +1,4 @@
+import 'package:agym/features/admin/presentation/pages/admin_page.dart';
 import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +39,7 @@ final GoRouter appRouter = GoRouter(
           path: '/profile',
           builder: (context, state) => const ProfilePage(),
         ),
+        GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
       ],
     ),
   ],
