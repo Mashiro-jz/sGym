@@ -1,6 +1,0 @@
-RZECZY, KTÓRE CHCE ZROBIĆ DO APLIKACJI:
-- CRUD dla trenerów odnośnie zajęć i zapisywanie się na zajęcia dla klientów,
-- strona główna, gdzie mamy fajne informacje (Stitch - U),
-- wszystko co potrzebne do generowania kodów QR, aby użytkownik mógł wejść na siłownie,
-- panel administratora musi być bardziej rozwinięty,
-- ROZPISKA DLA POSZCZEGÓLNYCH GRUP UŻYTKOWNIKÓW CO MOGĄ ROBIĆ, GDZIE I JAK oraz co ma się znajdywać w danych miejscach,

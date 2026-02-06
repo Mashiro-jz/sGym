@@ -1,5 +1,7 @@
-import 'package:agym/core/enums/sex_role.dart';
 import 'package:agym/core/enums/user_role.dart';
+import 'package:agym/core/utils/sex_role_extensions.dart';
+import 'package:agym/core/utils/user_role_extensions.dart';
+import 'package:agym/core/widget/login_out_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,14 +19,7 @@ class ProfilePage extends StatelessWidget {
         centerTitle: true,
         actions: [
           // Przycisk Wylogowania
-          IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Colors.red),
-            onPressed: () {
-              // To wywoła zmianę stanu na Unauthenticated
-              // AuthGate w main.dart to wykryje i przeniesie nas na /login
-              context.read<AuthCubit>().logout();
-            },
-          ),
+          LoginOutButton(),
         ],
       ),
       body: BlocBuilder<AuthCubit, AuthState>(
@@ -65,13 +60,13 @@ class ProfilePage extends StatelessWidget {
 
                   // 3. Rola (np. Klient / Trener)
                   Chip(
-                    label: Text(
-                      user.userRole == UserRole.trainer ? "Trener" : "Klient",
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: user.userRole == UserRole.trainer
-                        ? Colors.orange
-                        : Colors.green,
+                    label: Text(switch (user.userRole) {
+                      UserRole.manager => "MENADŻER",
+                      UserRole.trainer => "TRENER",
+                      UserRole.cashier => "KASJER",
+                      _ => "KLIENT",
+                    }, style: const TextStyle(color: Colors.white)),
+                    backgroundColor: user.userRole.color,
                   ),
 
                   if (user.userRole == UserRole.manager)
@@ -95,11 +90,7 @@ class ProfilePage extends StatelessWidget {
                   // 4. Lista szczegółów (Email, Telefon, Płeć)
                   _buildProfileItem(Icons.email, "E-mail", user.email),
                   _buildProfileItem(Icons.phone, "Telefon", user.phoneNumber),
-                  _buildProfileItem(
-                    Icons.wc,
-                    "Płeć",
-                    _translateSex(user.sexRole),
-                  ),
+                  _buildProfileItem(Icons.wc, "Płeć", user.sexRole.displayName),
                 ],
               ),
             );
@@ -132,17 +123,5 @@ class ProfilePage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  // Tłumacz płci z Enuma na Polski
-  String _translateSex(SexRole sex) {
-    switch (sex) {
-      case SexRole.man:
-        return "Mężczyzna";
-      case SexRole.woman:
-        return "Kobieta";
-      default:
-        return "Inna";
-    }
   }
 }
