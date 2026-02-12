@@ -1,11 +1,12 @@
 import 'package:agym/features/admin/presentation/pages/admin_page.dart';
 import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
+import 'package:agym/features/user/presentation/pages/user_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/main_wrapper.dart';
-import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/user/presentation/pages/user_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -36,10 +37,14 @@ final GoRouter appRouter = GoRouter(
         ),
         // Zakładka 2: Profil
         GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfilePage(),
+          path: '/user',
+          builder: (context, state) => const UserProfile(),
         ),
         GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
+        GoRoute(
+          path: '/user/settings',
+          builder: (context, state) => const ProfileSettingsPage(),
+        ),
       ],
     ),
   ],

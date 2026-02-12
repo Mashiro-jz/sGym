@@ -8,8 +8,8 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class UserProfile extends StatelessWidget {
+  const UserProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +82,13 @@ class ProfilePage extends StatelessWidget {
                         context.push('/admin');
                       },
                     ),
+
+                  IconButton(
+                    onPressed: () {
+                      context.push('/user/settings');
+                    },
+                    icon: Icon(Icons.settings),
+                  ),
 
                   const SizedBox(height: 30),
                   const Divider(),
