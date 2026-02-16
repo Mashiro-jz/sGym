@@ -1,4 +1,5 @@
 import 'package:agym/features/admin/presentation/cubit/admin_cubit.dart';
+import 'package:agym/features/auth/domain/usecases/delete_account.dart';
 import 'package:agym/features/auth/domain/usecases/get_all_users.dart';
 import 'package:agym/features/auth/domain/usecases/update_user_data.dart';
 import 'package:agym/features/auth/domain/usecases/update_user_role.dart';
@@ -33,6 +34,7 @@ Future<void> init() async {
   sl.registerFactory(() => UpdateUserRole(sl()));
   sl.registerFactory(() => GetAllUsers(sl()));
   sl.registerFactory(() => UpdateUserData(sl()));
+  sl.registerFactory(() => DeleteAccount(sl()));
 
   // USER FEATURE
   sl.registerFactory(
@@ -48,7 +50,9 @@ Future<void> init() async {
   sl.registerFactory(() => AdminCubit(getAllUsers: sl(), updateUserRole: sl()));
 
   // USER SETTINGS FEATURE
-  sl.registerFactory(() => UserCubit(updateUserData: sl()));
+  sl.registerFactory(
+    () => UserCubit(updateUserData: sl(), deleteAccount: sl()),
+  );
 
   // 2. Repository (Pośrednik)
   // Rejestrujemy jako 'LazySingleton' - jedna instancja na całe życie aplikacji.

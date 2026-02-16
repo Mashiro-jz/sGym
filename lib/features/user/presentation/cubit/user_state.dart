@@ -21,3 +21,5 @@ class UserError extends UserState {
   @override
   List<Object> get props => [message];
 }
+
+class UserAccountDeleted extends UserState {}

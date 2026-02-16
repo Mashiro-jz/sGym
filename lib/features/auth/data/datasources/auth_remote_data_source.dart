@@ -29,6 +29,8 @@ abstract class AuthRemoteDataSource {
     String? photoUrl,
     required SexRole sexRole,
   });
+
+  Future<void> deleteUser({required String password});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -135,5 +137,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'photoUrl': photoUrl,
       'sexRole': sexRole.name,
     });
+  }
+
+  @override
+  Future<void> deleteUser({required String password}) async {
+    final user = firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw Exception("Użytkownik nie jest zalogowany");
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+
+    await firebaseFirestore.collection('users').doc(user.uid).delete();
+
+    await user.delete();
   }
 }

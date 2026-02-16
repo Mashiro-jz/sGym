@@ -37,4 +37,6 @@ abstract class AuthRepository {
     String? photoUrl,
     required SexRole sexRole,
   });
+
+  Future<void> deleteAccount(String password);
 }

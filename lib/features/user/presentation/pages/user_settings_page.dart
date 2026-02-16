@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-// Importy core i konfiguracji
 import '../../../../core/config/injection_container.dart' as di;
 import '../../../../core/enums/sex_role.dart';
-import '../../../../core/utils/sex_role_extensions.dart'; // Upewnij się, że masz to rozszerzenie
-
-// Importy Auth (do odczytu aktualnego usera i odświeżania po zapisie)
+import '../../../../core/utils/sex_role_extensions.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
-
-// Importy User (do zapisu zmian)
 import '../cubit/user_cubit.dart';
 import '../cubit/user_state.dart';
 
@@ -20,7 +15,7 @@ class ProfileSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Wstrzykujemy UserCubit (odpowiedzialny za zapis)
+    // 1. Wstrzykujemy UserCubit (odpowiedzialny za zapis i usuwanie)
     return BlocProvider(
       create: (context) => di.sl<UserCubit>(),
       child: const _ProfileSettingsView(),
@@ -47,6 +42,57 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
   // Zmienna dla wybranej płci
   SexRole? _selectedSex;
 
+  // Funkcja pokazująca okno potwierdzenia usunięcia konta
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("Usuń konto"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Tej operacji nie można cofnąć. Wszystkie Twoje dane zostaną trwale usunięte.",
+                style: TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 20),
+              const Text("Aby potwierdzić, wpisz swoje hasło:"),
+              const SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: "Hasło",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext), // Anuluj
+              child: const Text("Anuluj"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Wywołujemy usuwanie w Cubicie
+                context.read<UserCubit>().deleteUserAccount(
+                  passwordController.text,
+                );
+                Navigator.pop(dialogContext); // Zamykamy dialog
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text("USUŃ NA ZAWSZE"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,7 +107,7 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       _emailController = TextEditingController(text: user.email);
       _selectedSex = user.sexRole;
     } else {
-      // Zabezpieczenie (gdyby user nie był zalogowany - mało prawdopodobne tutaj)
+      // Zabezpieczenie
       _firstNameController = TextEditingController();
       _lastNameController = TextEditingController();
       _phoneController = TextEditingController();
@@ -87,15 +133,13 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       if (authState is Authenticated) {
         final currentUser = authState.user;
 
-        // Wywołujemy UserCubit, aby wysłać dane do Firebase
         context.read<UserCubit>().submitUserDataUpdate(
           uid: currentUser.id,
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),
           phoneNumber: _phoneController.text.trim(),
-          email: _emailController
-              .text, // Email (read-only) przesyłamy dla spójności
-          photoUrl: currentUser.photoUrl, // Na razie zostawiamy stare zdjęcie
+          email: _emailController.text,
+          photoUrl: currentUser.photoUrl,
           sexRole: _selectedSex!,
         );
       }
@@ -104,32 +148,32 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    // 3. Nasłuchujemy zmian w UserCubit (Sukces/Błąd/Ładowanie)
+    // 3. Nasłuchujemy zmian w UserCubit
     return BlocConsumer<UserCubit, UserState>(
       listener: (context, state) {
         if (state is UserDataUpdateSuccess) {
-          // A. Sukces -> Pokaż info
+          // A. Sukces aktualizacji
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Profil zaktualizowany pomyślnie!"),
               backgroundColor: Colors.green,
             ),
           );
-
-          // B. Odśwież dane w głównej sesji (AuthCubit), żeby zmiany były widoczne w całej aplikacji
-          context.read<AuthCubit>().checkAuthStatus();
-
-          // C. Wróć do poprzedniego ekranu
+          context.read<AuthCubit>().checkAuthStatus(); // Odśwież AuthCubit
           context.pop();
+        } else if (state is UserAccountDeleted) {
+          // B. Sukces usunięcia konta
+          context.pop(); // Zamknij SettingsPage
+          context.read<AuthCubit>().logout(); // Wyloguj z aplikacji
+          // Router sam przeniesie do /login
         } else if (state is UserError) {
-          // D. Błąd -> Pokaż komunikat
+          // C. Błąd
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         }
       },
       builder: (context, state) {
-        // Blokujemy ekran podczas ładowania
         final isLoading = state is UserLoading;
 
         return Scaffold(
@@ -227,8 +271,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         const SizedBox(height: 30),
 
                         // --- POLA FORMULARZA ---
-
-                        // UID (Tylko do odczytu)
                         TextFormField(
                           initialValue: user.id,
                           readOnly: true,
@@ -243,7 +285,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         ),
                         const SizedBox(height: 15),
 
-                        // Email (Tylko do odczytu)
                         TextFormField(
                           controller: _emailController,
                           readOnly: true,
@@ -258,7 +299,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         ),
                         const SizedBox(height: 15),
 
-                        // Imię
                         TextFormField(
                           controller: _firstNameController,
                           decoration: const InputDecoration(
@@ -272,7 +312,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         ),
                         const SizedBox(height: 15),
 
-                        // Nazwisko
                         TextFormField(
                           controller: _lastNameController,
                           decoration: const InputDecoration(
@@ -286,7 +325,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         ),
                         const SizedBox(height: 15),
 
-                        // Telefon
                         TextFormField(
                           controller: _phoneController,
                           decoration: const InputDecoration(
@@ -301,7 +339,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                         ),
                         const SizedBox(height: 15),
 
-                        // Płeć (Dropdown)
                         DropdownButtonFormField<SexRole>(
                           initialValue: _selectedSex,
                           decoration: const InputDecoration(
@@ -312,7 +349,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           items: SexRole.values.map((sex) {
                             return DropdownMenuItem(
                               value: sex,
-                              // Użycie extension SexRoleX do wyświetlania nazwy
                               child: Text(sex.displayName),
                             );
                           }).toList(),
@@ -327,7 +363,7 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
                         const SizedBox(height: 30),
 
-                        // Przycisk Zapisz (Duży na dole)
+                        // Przycisk Zapisz
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -346,6 +382,36 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                                 : const Text("Zapisz zmiany"),
                           ),
                         ),
+
+                        const SizedBox(height: 50),
+                        const Divider(thickness: 2, color: Colors.redAccent),
+                        const SizedBox(height: 10),
+
+                        // --- SEKCJA USUWANIA KONTA ---
+                        const Text(
+                          "Strefa niebezpieczna",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            onPressed: isLoading
+                                ? null
+                                : () => _showDeleteConfirmationDialog(context),
+                            icon: const Icon(Icons.delete_forever),
+                            label: const Text("Usuń konto"),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
                       ],
                     ),
                   ),

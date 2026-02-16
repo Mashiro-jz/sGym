@@ -90,4 +90,9 @@ class AuthRepositoryImpl implements AuthRepository {
       sexRole: sexRole,
     );
   }
+
+  @override
+  Future<void> deleteAccount(String password) async {
+    await authRemoteDataSource.deleteUser(password: password);
+  }
 }
