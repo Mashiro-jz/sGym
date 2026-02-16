@@ -1,3 +1,4 @@
+import 'package:agym/core/enums/sex_role.dart';
 import 'package:agym/core/enums/user_role.dart';
 import 'package:agym/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:agym/features/auth/data/models/user_model.dart';
@@ -67,5 +68,31 @@ class AuthRepositoryImpl implements AuthRepository {
     required UserRole newRole,
   }) async {
     await authRemoteDataSource.updateUserRole(uid: uid, newRole: newRole);
+  }
+
+  @override
+  Future<void> updateUserProfile({
+    required String uid,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    String? photoUrl,
+    required SexRole sexRole,
+  }) async {
+    await authRemoteDataSource.updateUserProfile(
+      uid: uid,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      email: email,
+      photoUrl: photoUrl,
+      sexRole: sexRole,
+    );
+  }
+
+  @override
+  Future<void> deleteAccount(String password) async {
+    await authRemoteDataSource.deleteUser(password: password);
   }
 }

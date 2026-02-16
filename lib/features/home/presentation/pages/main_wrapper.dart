@@ -26,7 +26,7 @@ class MainWrapper extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/profile')) {
+    if (location.startsWith('/user')) {
       return 1;
     }
     return 0; // Domyślnie Home
@@ -38,7 +38,7 @@ class MainWrapper extends StatelessWidget {
         context.go('/home');
         break;
       case 1:
-        context.go('/profile');
+        context.go('/user');
         break;
     }
   }

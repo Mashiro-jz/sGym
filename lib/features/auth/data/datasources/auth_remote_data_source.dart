@@ -1,3 +1,4 @@
+import 'package:agym/core/enums/sex_role.dart';
 import 'package:agym/core/enums/user_role.dart';
 import 'package:agym/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +19,18 @@ abstract class AuthRemoteDataSource {
 
   Future<List<UserModel>> getAllUsers();
   Future<void> updateUserRole({required String uid, required UserRole newRole});
+
+  Future<void> updateUserProfile({
+    required String uid,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    String? photoUrl,
+    required SexRole sexRole,
+  });
+
+  Future<void> deleteUser({required String password});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -104,5 +117,45 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await firebaseFirestore.collection('users').doc(uid).update({
       'userRole': roleString,
     });
+  }
+
+  @override
+  Future<void> updateUserProfile({
+    required String uid,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    String? photoUrl,
+    required SexRole sexRole,
+  }) {
+    return firebaseFirestore.collection('users').doc(uid).update({
+      'firstName': firstName,
+      'lastName': lastName,
+      'phoneNumber': phoneNumber,
+      'email': email,
+      'photoUrl': photoUrl,
+      'sexRole': sexRole.name,
+    });
+  }
+
+  @override
+  Future<void> deleteUser({required String password}) async {
+    final user = firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw Exception("Użytkownik nie jest zalogowany");
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+
+    await firebaseFirestore.collection('users').doc(user.uid).delete();
+
+    await user.delete();
   }
 }

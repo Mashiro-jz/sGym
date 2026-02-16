@@ -1,3 +1,4 @@
+import 'package:agym/core/enums/sex_role.dart';
 import 'package:agym/core/enums/user_role.dart';
 
 import '../entities/user.dart';
@@ -26,4 +27,16 @@ abstract class AuthRepository {
 
   Future<List<User>> getAllUsers();
   Future<void> updateUserRole({required String uid, required UserRole newRole});
+
+  Future<void> updateUserProfile({
+    required String uid,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    String? photoUrl,
+    required SexRole sexRole,
+  });
+
+  Future<void> deleteAccount(String password);
 }
