@@ -1,0 +1,71 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entities/gym_class.dart';
+import '../../domain/usecases/create_gym_class.dart';
+import '../../domain/usecases/delete_gym_class.dart';
+import '../../domain/usecases/get_schedule.dart';
+import '../../domain/usecases/update_gym_class.dart';
+import 'schedule_state.dart';
+
+class ScheduleCubit extends Cubit<ScheduleState> {
+  final CreateGymClass createGymClass;
+  final DeleteGymClass deleteGymClass;
+  final GetSchedule getSchedule;
+  final UpdateGymClass updateGymClass;
+
+  DateTime _currentDate = DateTime.now();
+
+  ScheduleCubit({
+    required this.createGymClass,
+    required this.deleteGymClass,
+    required this.getSchedule,
+    required this.updateGymClass,
+  }) : super(ScheduleInitial());
+
+  // 1. Pobieranie
+  Future<void> loadSchedule(DateTime date) async {
+    _currentDate = date;
+    emit(ScheduleLoading());
+    try {
+      final classes = await getSchedule(date);
+      emit(ScheduleLoaded(classes));
+    } catch (e) {
+      emit(ScheduleError("Nie udało się pobrać grafiku: $e"));
+    }
+  }
+
+  // 2. Dodawanie
+  Future<void> addClass(GymClass gymClass) async {
+    emit(ScheduleLoading());
+    try {
+      await createGymClass(gymClass);
+      emit(const ScheduleOperationSuccess("Dodano nowe zajęcia"));
+      loadSchedule(_currentDate);
+    } catch (e) {
+      emit(ScheduleError("Nie udało się dodać zajęć: $e"));
+    }
+  }
+
+  // 3. Usuwanie
+  Future<void> deleteClass(String classId) async {
+    emit(ScheduleLoading());
+    try {
+      await deleteGymClass(classId);
+      emit(const ScheduleOperationSuccess("Usunięto zajęcia"));
+      loadSchedule(_currentDate);
+    } catch (e) {
+      emit(ScheduleError("Nie udało się usunąć zajęć: $e"));
+    }
+  }
+
+  // 4. Edycja
+  Future<void> updateClass(GymClass gymClass) async {
+    emit(ScheduleLoading());
+    try {
+      await updateGymClass(gymClass);
+      emit(const ScheduleOperationSuccess("Zaktualizowano zajęcia."));
+      loadSchedule(_currentDate);
+    } catch (e) {
+      emit(ScheduleError("Błąd edycji: $e"));
+    }
+  }
+}

@@ -2,6 +2,7 @@ import 'package:agym/core/config/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/config/injection_container.dart' as di;
 import 'features/auth/presentation/cubit/auth_cubit.dart';
@@ -16,6 +17,8 @@ void main() async {
 
   // 2. Inicjalizacja Dependency Injection
   await di.init();
+
+  await initializeDateFormatting('pl');
 
   runApp(const MyApp());
 }
