@@ -82,12 +82,14 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     // Sprawdzamy, kim jest użytkownik (z AuthCubit)
     final authState = context.watch<AuthCubit>().state;
     bool isTrainerOrAdmin = false;
+    String currentUserId = '';
 
     if (authState is Authenticated) {
       // Dostosuj ten warunek do swoich Enumów ról!
       isTrainerOrAdmin =
           authState.user.userRole == UserRole.trainer ||
           authState.user.userRole == UserRole.manager;
+      currentUserId = authState.user.id;
     }
 
     return Scaffold(
@@ -151,7 +153,12 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               itemCount: state.classes.length,
               itemBuilder: (context, index) {
                 final gymClass = state.classes[index];
-                return _buildClassCard(gymClass, isTrainerOrAdmin, context);
+                return _buildClassCard(
+                  gymClass,
+                  isTrainerOrAdmin,
+                  context,
+                  currentUserId,
+                );
               },
             );
           }
@@ -167,9 +174,15 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     GymClass gymClass,
     bool isTrainer,
     BuildContext context,
+    String currentUserId,
   ) {
     final timeStr =
         "${gymClass.startTime.hour.toString().padLeft(2, '0')}:${gymClass.startTime.minute.toString().padLeft(2, '0')}";
+
+    // Logika stanu przycisku
+    final isRegistered = gymClass.registeredUserIds.contains(currentUserId);
+    final isFull = gymClass.registeredUserIds.length >= gymClass.capacity;
+    final hasStarted = DateTime.now().isAfter(gymClass.startTime);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -191,6 +204,10 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             Text("Trener ID: ${gymClass.trainerId}"),
             Text(
               "Miejsc: ${gymClass.registeredUserIds.length}/${gymClass.capacity}",
+              style: TextStyle(
+                color: isFull && !isRegistered ? Colors.red : Colors.black,
+                fontWeight: isFull ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ],
         ),
@@ -215,13 +232,55 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                   ),
                 ],
               )
-            : ElevatedButton(
-                onPressed: () {
-                  // Logika zapisywania się dla zwykłego usera
-                },
-                child: const Text("Zapisz się"),
+            : _buildUserActionButton(
+                context,
+                gymClass,
+                isRegistered,
+                isFull,
+                hasStarted,
               ),
       ),
+    );
+  }
+
+  // Pomocnicza funkcja do budowania przycisku dla Usera
+  Widget _buildUserActionButton(
+    BuildContext context,
+    GymClass gymClass,
+    bool isRegistered,
+    bool isFull,
+    bool hasStarted,
+  ) {
+    if (hasStarted) {
+      return const Text("Zakończone", style: TextStyle(color: Colors.grey));
+    }
+
+    if (isRegistered) {
+      return ElevatedButton(
+        onPressed: () {
+          context.read<ScheduleCubit>().signOutFromClassActivity(gymClass);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red.shade100,
+          foregroundColor: Colors.red,
+        ),
+        child: const Text("Wypisz się"),
+      );
+    }
+
+    if (isFull) {
+      return const ElevatedButton(onPressed: null, child: Text("Brak miejsc"));
+    }
+
+    return ElevatedButton(
+      onPressed: () {
+        context.read<ScheduleCubit>().signUpForClassActivity(gymClass);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green.shade100,
+        foregroundColor: Colors.green.shade800,
+      ),
+      child: const Text("Zapisz się"),
     );
   }
 }

@@ -1,9 +1,13 @@
+import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/gym_class.dart';
 import '../../domain/usecases/create_gym_class.dart';
 import '../../domain/usecases/delete_gym_class.dart';
 import '../../domain/usecases/get_schedule.dart';
 import '../../domain/usecases/update_gym_class.dart';
+import '../../domain/usecases/signout_from_class.dart';
+import '../../domain/usecases/signup_for_class.dart';
 import 'schedule_state.dart';
 
 class ScheduleCubit extends Cubit<ScheduleState> {
@@ -11,6 +15,9 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   final DeleteGymClass deleteGymClass;
   final GetSchedule getSchedule;
   final UpdateGymClass updateGymClass;
+  final SignupForClass signUpForClass;
+  final SignoutFromClass signOutFromClass;
+  final AuthCubit authCubit;
 
   DateTime _currentDate = DateTime.now();
 
@@ -19,6 +26,9 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     required this.deleteGymClass,
     required this.getSchedule,
     required this.updateGymClass,
+    required this.signUpForClass,
+    required this.signOutFromClass,
+    required this.authCubit,
   }) : super(ScheduleInitial());
 
   // 1. Pobieranie
@@ -66,6 +76,33 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       loadSchedule(_currentDate);
     } catch (e) {
       emit(ScheduleError("Błąd edycji: $e"));
+    }
+  }
+
+  Future<void> signUpForClassActivity(GymClass gymClass) async {
+    final currentUser = authCubit.state;
+    if (currentUser is! Authenticated) return;
+    try {
+      emit(ScheduleLoading());
+      await signUpForClass(gymClass, currentUser.user.id);
+      emit(const ScheduleOperationSuccess("Zapisano na zajęcia."));
+      loadSchedule(_currentDate);
+    } catch (e) {
+      emit(ScheduleError("Nie udało się zapisać na zajęcia: $e"));
+      loadSchedule(gymClass.startTime);
+    }
+  }
+
+  Future<void> signOutFromClassActivity(GymClass gymClass) async {
+    final currentUser = authCubit.state;
+    if (currentUser is! Authenticated) return;
+    try {
+      emit(ScheduleLoading());
+      await signOutFromClass(gymClass, currentUser.user.id);
+      emit(const ScheduleOperationSuccess("Wypisano z zajęć."));
+      loadSchedule(_currentDate);
+    } catch (e) {
+      emit(ScheduleError("Nie udało się wypisać z zajęć: $e"));
     }
   }
 }

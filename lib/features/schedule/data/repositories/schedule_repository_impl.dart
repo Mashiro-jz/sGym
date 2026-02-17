@@ -31,4 +31,14 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
     final classModel = GymClassModel.fromEntity(gymClass);
     return dataSource.updateClass(classModel);
   }
+
+  @override
+  Future<void> signOutFromClass(String classId, String userId) {
+    return dataSource.signOutFromClass(classId, userId);
+  }
+
+  @override
+  Future<void> signUpForClass(String classId, String userId) {
+    return dataSource.signUpForClass(classId, userId);
+  }
 }

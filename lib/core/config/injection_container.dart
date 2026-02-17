@@ -1,3 +1,5 @@
+import 'package:agym/features/schedule/domain/usecases/signout_from_class.dart';
+import 'package:agym/features/schedule/domain/usecases/signup_for_class.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -38,7 +40,7 @@ Future<void> init() async {
   // ================================================================
 
   // Cubits
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => AuthCubit(
       loginUser: sl(),
       getCurrentUser: sl(),
@@ -46,6 +48,7 @@ Future<void> init() async {
       registerUser: sl(),
     ),
   );
+
   sl.registerFactory(
     () => UserCubit(updateUserData: sl(), deleteAccount: sl()),
   );
@@ -58,7 +61,7 @@ Future<void> init() async {
   sl.registerFactory(() => GetCurrentUser(sl()));
   sl.registerFactory(() => UpdateUserData(sl()));
   sl.registerFactory(() => DeleteAccount(sl()));
-
+  // USUNIĘTO DUPLIKATY Signup/Signout z tej sekcji
   sl.registerFactory(() => UpdateUserRole(sl()));
   sl.registerFactory(() => GetAllUsers(sl()));
 
@@ -83,6 +86,9 @@ Future<void> init() async {
       deleteGymClass: sl(),
       getSchedule: sl(),
       updateGymClass: sl(),
+      signUpForClass: sl(),
+      signOutFromClass: sl(),
+      authCubit: sl(),
     ),
   );
 
@@ -91,6 +97,8 @@ Future<void> init() async {
   sl.registerFactory(() => CreateGymClass(sl()));
   sl.registerFactory(() => DeleteGymClass(sl()));
   sl.registerFactory(() => UpdateGymClass(sl()));
+  sl.registerFactory(() => SignupForClass(sl()));
+  sl.registerFactory(() => SignoutFromClass(sl()));
 
   // 3. Repository
   sl.registerLazySingleton<ScheduleRepository>(

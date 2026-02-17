@@ -8,4 +8,8 @@ abstract class ScheduleRepository {
   Future<void> updateClass(GymClass gymClass);
 
   Future<void> deleteClass(String classId);
+
+  Future<void> signUpForClass(String classId, String userId);
+
+  Future<void> signOutFromClass(String classId, String userId);
 }
