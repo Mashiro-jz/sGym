@@ -1,7 +1,9 @@
+import 'package:agym/features/auth/domain/usecases/get_users_details.dart';
 import 'package:agym/features/schedule/domain/usecases/get_trainer_classes.dart';
 import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:agym/features/schedule/domain/usecases/signout_from_class.dart';
 import 'package:agym/features/schedule/domain/usecases/signup_for_class.dart';
+import 'package:agym/features/schedule/presentation/cubit/class_participants_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/trainer_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -67,8 +69,7 @@ Future<void> init() async {
   sl.registerFactory(() => DeleteAccount(sl()));
   sl.registerFactory(() => UpdateUserRole(sl()));
   sl.registerFactory(() => GetAllUsers(sl()));
-  sl.registerFactory(() => GetUserSchedule(sl()));
-  sl.registerFactory(() => GetTrainerClasses(sl()));
+  sl.registerFactory(() => GetUsersDetails(sl()));
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -84,7 +85,7 @@ Future<void> init() async {
   // FEATURE: SCHEDULE
   // ================================================================
 
-  // 1. Cubit
+  // Cubit
   sl.registerFactory(
     () => ScheduleCubit(
       createGymClass: sl(),
@@ -97,21 +98,24 @@ Future<void> init() async {
       getUserSchedule: sl(),
     ),
   );
+  sl.registerFactory(() => ClassParticipantsCubit(getUsersDetails: sl()));
 
-  // 2. Use Cases
+  // Use Cases
   sl.registerFactory(() => GetSchedule(sl()));
   sl.registerFactory(() => CreateGymClass(sl()));
   sl.registerFactory(() => DeleteGymClass(sl()));
   sl.registerFactory(() => UpdateGymClass(sl()));
   sl.registerFactory(() => SignupForClass(sl()));
   sl.registerFactory(() => SignoutFromClass(sl()));
+  sl.registerFactory(() => GetUserSchedule(sl()));
+  sl.registerFactory(() => GetTrainerClasses(sl()));
 
-  // 3. Repository
+  // Repository
   sl.registerLazySingleton<ScheduleRepository>(
     () => ScheduleRepositoryImpl(dataSource: sl()),
   );
 
-  // 4. Data Source
+  // Data Source
   sl.registerLazySingleton<ScheduleRemoteDataSource>(
     () => ScheduleRemoteDataSourceImpl(firebaseFirestore: sl()),
   );

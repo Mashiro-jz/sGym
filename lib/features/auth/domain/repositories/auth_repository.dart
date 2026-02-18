@@ -39,4 +39,6 @@ abstract class AuthRepository {
   });
 
   Future<void> deleteAccount(String password);
+
+  Future<List<User>> getUsersDetails(List<String> uids);
 }
