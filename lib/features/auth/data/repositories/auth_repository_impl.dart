@@ -95,4 +95,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> deleteAccount(String password) async {
     await authRemoteDataSource.deleteUser(password: password);
   }
+
+  @override
+  Future<List<User>> getUsersDetails(List<String> uids) async {
+    return await authRemoteDataSource
+        .getUsersDetails(uids)
+        .then(
+          (userModels) => userModels.map((model) => model.toEntity()).toList(),
+        );
+  }
 }

@@ -1,5 +1,9 @@
 import 'package:agym/features/admin/presentation/pages/admin_page.dart';
 import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
+import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/presentation/pages/schedule/add_edit_class_page.dart';
+import 'package:agym/features/schedule/presentation/pages/schedule/schedule_page.dart';
+import 'package:agym/features/schedule/presentation/pages/trainer/trainer_page.dart';
 import 'package:agym/features/user/presentation/pages/user_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,8 +46,25 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
         GoRoute(
+          path: '/trainer',
+          builder: (context, state) => const TrainerPage(),
+        ),
+        GoRoute(
           path: '/user/settings',
           builder: (context, state) => const ProfileSettingsPage(),
+        ),
+        // Zakładka 3: Grafik zajęć
+        GoRoute(
+          path: '/schedule',
+          builder: (context, state) => const SchedulePage(),
+        ),
+        GoRoute(
+          path: '/add-edit-class',
+          builder: (context, state) {
+            // Odbieramy obiekt przekazany przy nawigacji (może być null)
+            final gymClass = state.extra as GymClass?;
+            return AddEditClassPage(gymClass: gymClass);
+          },
         ),
       ],
     ),

@@ -31,6 +31,8 @@ abstract class AuthRemoteDataSource {
   });
 
   Future<void> deleteUser({required String password});
+
+  Future<List<UserModel>> getUsersDetails(List<String> uids);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -157,5 +159,32 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await firebaseFirestore.collection('users').doc(user.uid).delete();
 
     await user.delete();
+  }
+
+  // TODO: PRZY ZMIANIE BAZY DANYCH, PAMIĘTAĆ O TYM LIMICIE
+  @override
+  Future<List<UserModel>> getUsersDetails(List<String> uids) async {
+    // 1. Zabezpieczenie przed pustą listą
+    if (uids.isEmpty) {
+      return [];
+    }
+
+    // UWAGA: Firestore whereIn ma limit 10 elementów.
+    // Jeśli przewidujesz grupy > 10 osób, trzeba to rozbić na paczki (chunks).
+    // Poniżej proste rozwiązanie biorące pierwsze 10 osób (aby uniknąć crasha):
+    final safeUids = uids.length > 10 ? uids.sublist(0, 10) : uids;
+
+    try {
+      final snapshot = await firebaseFirestore
+          .collection('users')
+          .where('id', whereIn: safeUids)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception("Błąd pobierania użytkowników: $e");
+    }
   }
 }
