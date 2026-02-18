@@ -8,6 +8,7 @@ abstract class ScheduleRemoteDataSource {
   Future<void> deleteClass(String classId);
   Future<void> signUpForClass(String classId, String userId);
   Future<void> signOutFromClass(String classId, String userId);
+  Future<List<GymClassModel>> getUserSchedule(String userId);
 }
 
 class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
@@ -65,5 +66,21 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
     await firebaseFirestore.collection('classes').doc(classId).update({
       'registeredUserIds': FieldValue.arrayRemove([userId]),
     });
+  }
+
+  @override
+  Future<List<GymClassModel>> getUserSchedule(String userId) async {
+    final snapshot = await firebaseFirestore
+        .collection('classes')
+        .where('registeredUserIds', arrayContains: userId)
+        .get();
+
+    final classes = snapshot.docs
+        .map((doc) => GymClassModel.fromJson(doc.data()))
+        .toList();
+
+    classes.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    return classes;
   }
 }

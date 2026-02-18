@@ -12,4 +12,6 @@ abstract class ScheduleRepository {
   Future<void> signUpForClass(String classId, String userId);
 
   Future<void> signOutFromClass(String classId, String userId);
+
+  Future<List<GymClass>> getUserSchedule(String userId);
 }

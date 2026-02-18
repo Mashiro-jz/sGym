@@ -1,23 +1,21 @@
+import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../core/config/injection_container.dart' as di;
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
-import '../../domain/entities/gym_class.dart';
-import '../cubit/schedule_cubit.dart';
-import '../cubit/schedule_state.dart';
 
 class AddEditClassPage extends StatelessWidget {
-  final GymClass? gymClass; // Jeśli null -> Tworzenie, Jeśli obiekt -> Edycja
+  final GymClass? gymClass;
 
   const AddEditClassPage({super.key, this.gymClass});
 
   @override
   Widget build(BuildContext context) {
-    // Wstrzykujemy ScheduleCubit, żeby móc wysłać dane
     return BlocProvider(
       create: (context) => di.sl<ScheduleCubit>(),
       child: _AddEditClassView(gymClass: gymClass),
@@ -50,7 +48,6 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   @override
   void initState() {
     super.initState();
-    // Ustawiamy wartości początkowe (puste lub z edytowanego obiektu)
     _nameController = TextEditingController(text: widget.gymClass?.name ?? '');
     _descriptionController = TextEditingController(
       text: widget.gymClass?.description ?? '',
@@ -77,35 +74,34 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
     super.dispose();
   }
 
-  // Wybór Daty
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate:
-          DateTime.now(), // Nie pozwalamy na daty z przeszłości przy tworzeniu
+      firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      locale: const Locale('pl'),
     );
-    if (picked != null) {
-      setState(() => _selectedDate = picked);
-    }
+    if (picked != null) setState(() => _selectedDate = picked);
   }
 
-  // Wybór Godziny
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
-    if (picked != null) {
-      setState(() => _selectedTime = picked);
-    }
+    if (picked != null) setState(() => _selectedTime = picked);
   }
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
 
-    // Łączymy datę i godzinę w jeden obiekt DateTime
     final finalDateTime = DateTime(
       _selectedDate.year,
       _selectedDate.month,
@@ -114,7 +110,6 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       _selectedTime.minute,
     );
 
-    // Pobieramy ID aktualnego użytkownika (Trenera)
     final authState = context.read<AuthCubit>().state;
     String trainerId = "unknown";
     if (authState is Authenticated) {
@@ -122,7 +117,6 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
     }
 
     final newClass = GymClass(
-      // Jeśli edytujemy, zachowaj stare ID. Jeśli tworzymy, wygeneruj nowe (używamy timestamp jako proste ID)
       id: isEditing
           ? widget.gymClass!.id
           : DateTime.now().millisecondsSinceEpoch.toString(),
@@ -132,7 +126,6 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       startTime: finalDateTime,
       durationMinutes: int.parse(_durationController.text),
       capacity: int.parse(_capacityController.text),
-      // Przy edycji zachowujemy listę zapisanych, przy nowym pusta lista
       registeredUserIds: isEditing ? widget.gymClass!.registeredUserIds : [],
     );
 
@@ -154,7 +147,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
               backgroundColor: Colors.green,
             ),
           );
-          context.pop(true); // Wracamy do poprzedniego ekranu i odświeżamy
+          context.pop(true);
         }
         if (state is ScheduleError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -164,100 +157,168 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(isEditing ? "Edytuj zajęcia" : "Nowe zajęcia"),
+          title: Text(isEditing ? "Edytuj zajęcia" : "Zaplanuj zajęcia"),
+          centerTitle: true,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildSectionTitle("Informacje podstawowe"),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: "Nazwa zajęć",
-                    border: OutlineInputBorder(),
+                  decoration: _inputDecoration(
+                    "Nazwa zajęć",
+                    Icons.fitness_center,
                   ),
                   validator: (v) => v!.isEmpty ? "Podaj nazwę" : null,
                 ),
                 const SizedBox(height: 15),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: "Opis",
-                    border: OutlineInputBorder(),
+                  decoration: _inputDecoration(
+                    "Opis treningu",
+                    Icons.description,
                   ),
-                  maxLines: 3,
+                  maxLines: 4,
+                  minLines: 2,
                 ),
-                const SizedBox(height: 15),
+
+                const SizedBox(height: 25),
+                _buildSectionTitle("Termin"),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildPickerCard(
+                        icon: Icons.calendar_today,
+                        label: DateFormat('dd.MM.yyyy').format(_selectedDate),
+                        onTap: _pickDate,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: _buildPickerCard(
+                        icon: Icons.access_time,
+                        label: _selectedTime.format(context),
+                        onTap: _pickTime,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 25),
+                _buildSectionTitle("Szczegóły"),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
                       child: TextFormField(
                         controller: _durationController,
-                        decoration: const InputDecoration(
-                          labelText: "Czas (min)",
-                          border: OutlineInputBorder(),
-                        ),
+                        decoration: _inputDecoration("Czas (min)", Icons.timer),
                         keyboardType: TextInputType.number,
-                        validator: (v) => v!.isEmpty ? "Podaj czas" : null,
+                        validator: (v) => v!.isEmpty ? "Wymagane" : null,
                       ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(
                       child: TextFormField(
                         controller: _capacityController,
-                        decoration: const InputDecoration(
-                          labelText: "Miejsca",
-                          border: OutlineInputBorder(),
+                        decoration: _inputDecoration(
+                          "Limit osób",
+                          Icons.people,
                         ),
                         keyboardType: TextInputType.number,
-                        validator: (v) => v!.isEmpty ? "Podaj ilość" : null,
+                        validator: (v) => v!.isEmpty ? "Wymagane" : null,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                // Sekcja Daty i Czasu
-                ListTile(
-                  title: const Text("Data"),
-                  subtitle: Text(
-                    DateFormat('yyyy-MM-dd').format(_selectedDate),
-                  ),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: _pickDate,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ListTile(
-                  title: const Text("Godzina"),
-                  subtitle: Text(_selectedTime.format(context)),
-                  trailing: const Icon(Icons.access_time),
-                  onTap: _pickTime,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-                const SizedBox(height: 30),
+
+                const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 55,
                   child: ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueGrey,
+                      backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: Text(isEditing ? "Zapisz zmiany" : "Utwórz zajęcia"),
+                    child: Text(
+                      isEditing ? "Zapisz zmiany" : "Utwórz zajęcia",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: Colors.deepPurple.shade300),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title.toUpperCase(),
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: Colors.grey.shade600,
+      ),
+    );
+  }
+
+  Widget _buildPickerCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.deepPurple),
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
         ),
       ),
     );

@@ -1,16 +1,15 @@
+import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/config/injection_container.dart' as di;
-// Upewnij się, że masz ten enum, lub dostosuj warunek do Stringa
 import '../../../../core/enums/user_role.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
-import '../../domain/entities/gym_class.dart';
-import '../cubit/schedule_cubit.dart';
-import '../cubit/schedule_state.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage({super.key});
@@ -40,25 +39,21 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
       initialDate: _selectedDate,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      locale: const Locale('pl'),
     );
 
     if (newDate != null) {
-      setState(() {
-        _selectedDate = newDate;
-      });
-      if (mounted) {
-        context.read<ScheduleCubit>().loadSchedule(newDate);
-      }
+      setState(() => _selectedDate = newDate);
+      if (mounted) context.read<ScheduleCubit>().loadSchedule(newDate);
     }
   }
 
-  // Funkcja usuwania (tylko dla trenera lub managera)
   void _deleteClass(BuildContext context, String classId) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("Usuń zajęcia"),
-        content: const Text("Czy na pewno chcesz usunąć te zajęcia?"),
+        content: const Text("Nie będzie można tego cofnąć."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -79,13 +74,11 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
 
   @override
   Widget build(BuildContext context) {
-    // Sprawdzamy, kim jest użytkownik (z AuthCubit)
     final authState = context.watch<AuthCubit>().state;
     bool isTrainerOrAdmin = false;
     String currentUserId = '';
 
     if (authState is Authenticated) {
-      // Dostosuj ten warunek do swoich Enumów ról!
       isTrainerOrAdmin =
           authState.user.userRole == UserRole.trainer ||
           authState.user.userRole == UserRole.manager;
@@ -93,33 +86,43 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100, // Lekkie tło
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Grafik zajęć", style: TextStyle(fontSize: 18)),
-            Text(
-              DateFormat('EEEE, d MMMM yyyy', 'pl').format(_selectedDate),
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month),
-            onPressed: _pickDate,
+        title: InkWell(
+          onTap: _pickDate,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Grafik zajęć", style: TextStyle(fontSize: 16)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    DateFormat('EEEE, d MMMM', 'pl').format(_selectedDate),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       floatingActionButton: isTrainerOrAdmin
-          ? FloatingActionButton(
+          ? FloatingActionButton.extended(
               onPressed: () async {
                 await context.push('/add-edit-class');
                 if (context.mounted) {
                   context.read<ScheduleCubit>().loadSchedule(_selectedDate);
                 }
               },
-              child: const Icon(Icons.add),
+              icon: const Icon(Icons.add),
+              label: const Text("Dodaj zajęcia"),
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
             )
           : null,
       body: BlocConsumer<ScheduleCubit, ScheduleState>(
@@ -146,14 +149,16 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ScheduleLoaded) {
             if (state.classes.isEmpty) {
-              return const Center(child: Text("Brak zajęć w tym dniu."));
+              return _buildEmptyState();
             }
 
-            return ListView.builder(
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
               itemCount: state.classes.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final gymClass = state.classes[index];
-                return _buildClassCard(
+                return _buildModernClassCard(
                   gymClass,
                   isTrainerOrAdmin,
                   context,
@@ -162,89 +167,277 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               },
             );
           }
-          return const Center(
-            child: Text("Wybierz datę, aby zobaczyć grafik."),
-          );
+          return const Center(child: Text("Wczytywanie..."));
         },
       ),
     );
   }
 
-  Widget _buildClassCard(
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.weekend,
+            size: 80,
+            color: Colors.deepPurple.withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "Brak zajęć w tym dniu",
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernClassCard(
     GymClass gymClass,
     bool isTrainer,
     BuildContext context,
     String currentUserId,
   ) {
-    final timeStr =
-        "${gymClass.startTime.hour.toString().padLeft(2, '0')}:${gymClass.startTime.minute.toString().padLeft(2, '0')}";
+    final startTimeStr = DateFormat('HH:mm').format(gymClass.startTime);
+    final endTimeStr = DateFormat('HH:mm').format(
+      gymClass.startTime.add(Duration(minutes: gymClass.durationMinutes)),
+    );
 
-    // Logika stanu przycisku
     final isRegistered = gymClass.registeredUserIds.contains(currentUserId);
     final isFull = gymClass.registeredUserIds.length >= gymClass.capacity;
     final hasStarted = DateTime.now().isAfter(gymClass.startTime);
+    final placesLeft = gymClass.capacity - gymClass.registeredUserIds.length;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blueGrey,
-          child: Text(
-            timeStr,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        title: Text(
-          gymClass.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+        border: isRegistered
+            ? Border.all(color: Colors.green.shade300, width: 2)
+            : null,
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Trener ID: ${gymClass.trainerId}"),
-            Text(
-              "Miejsc: ${gymClass.registeredUserIds.length}/${gymClass.capacity}",
-              style: TextStyle(
-                color: isFull && !isRegistered ? Colors.red : Colors.black,
-                fontWeight: isFull ? FontWeight.bold : FontWeight.normal,
+            // --- LEWA STRONA: CZAS ---
+            Container(
+              width: 80,
+              decoration: BoxDecoration(
+                color: hasStarted
+                    ? Colors.grey.shade200
+                    : Colors.deepPurple.shade50,
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(16),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    startTimeStr,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: hasStarted ? Colors.grey : Colors.deepPurple,
+                    ),
+                  ),
+                  Text(
+                    endTimeStr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: hasStarted
+                          ? Colors.grey
+                          : Colors.deepPurple.shade300,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // --- PRAWA STRONA: SZCZEGÓŁY ---
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tytuł i status
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            gymClass.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (isRegistered)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 20,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Opis
+                    if (gymClass.description.isNotEmpty)
+                      Text(
+                        gymClass.description,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 13,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                    const SizedBox(height: 10),
+
+                    // Tagi (Chips)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildInfoChip(
+                          Icons.timer_outlined,
+                          "${gymClass.durationMinutes} min",
+                        ),
+                        _buildInfoChip(
+                          Icons.people_outline,
+                          isFull ? "Pełne" : "$placesLeft wolnych",
+                          color: isFull
+                              ? Colors.red
+                              : (placesLeft < 3 ? Colors.orange : Colors.grey),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+                    const Divider(),
+
+                    // Przyciski akcji
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Instruktor (Placeholder na razie)
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.person,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Instruktor",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Przyciski
+                        if (isTrainer)
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () async {
+                                  await context.push(
+                                    '/add-edit-class',
+                                    extra: gymClass,
+                                  );
+                                  if (context.mounted) {
+                                    context.read<ScheduleCubit>().loadSchedule(
+                                      _selectedDate,
+                                    );
+                                  }
+                                },
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () =>
+                                    _deleteClass(context, gymClass.id),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ],
+                          )
+                        else
+                          _buildModernUserButton(
+                            context,
+                            gymClass,
+                            isRegistered,
+                            isFull,
+                            hasStarted,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
-        trailing: isTrainer
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.blue),
-                    onPressed: () async {
-                      await context.push('/add-edit-class', extra: gymClass);
-                      if (context.mounted) {
-                        context.read<ScheduleCubit>().loadSchedule(
-                          _selectedDate,
-                        );
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deleteClass(context, gymClass.id),
-                  ),
-                ],
-              )
-            : _buildUserActionButton(
-                context,
-                gymClass,
-                isRegistered,
-                isFull,
-                hasStarted,
-              ),
       ),
     );
   }
 
-  // Pomocnicza funkcja do budowania przycisku dla Usera
-  Widget _buildUserActionButton(
+  Widget _buildInfoChip(
+    IconData icon,
+    String label, {
+    Color color = Colors.grey,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernUserButton(
     BuildContext context,
     GymClass gymClass,
     bool isRegistered,
@@ -252,33 +445,38 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     bool hasStarted,
   ) {
     if (hasStarted) {
-      return const Text("Zakończone", style: TextStyle(color: Colors.grey));
+      return Text(
+        "Zakończone",
+        style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+      );
     }
 
     if (isRegistered) {
-      return ElevatedButton(
-        onPressed: () {
-          context.read<ScheduleCubit>().signOutFromClassActivity(gymClass);
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red.shade100,
+      return OutlinedButton(
+        onPressed: () =>
+            context.read<ScheduleCubit>().signOutFromClassActivity(gymClass),
+        style: OutlinedButton.styleFrom(
           foregroundColor: Colors.red,
+          side: const BorderSide(color: Colors.red),
+          visualDensity: VisualDensity.compact,
         ),
         child: const Text("Wypisz się"),
       );
     }
 
     if (isFull) {
-      return const ElevatedButton(onPressed: null, child: Text("Brak miejsc"));
+      return const Text(
+        "Brak miejsc",
+        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+      );
     }
 
-    return ElevatedButton(
-      onPressed: () {
-        context.read<ScheduleCubit>().signUpForClassActivity(gymClass);
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green.shade100,
-        foregroundColor: Colors.green.shade800,
+    return FilledButton(
+      onPressed: () =>
+          context.read<ScheduleCubit>().signUpForClassActivity(gymClass),
+      style: FilledButton.styleFrom(
+        backgroundColor: Colors.deepPurple,
+        visualDensity: VisualDensity.compact,
       ),
       child: const Text("Zapisz się"),
     );

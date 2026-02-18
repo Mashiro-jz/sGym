@@ -1,3 +1,4 @@
+import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:agym/features/schedule/domain/usecases/signout_from_class.dart';
 import 'package:agym/features/schedule/domain/usecases/signup_for_class.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,9 +62,9 @@ Future<void> init() async {
   sl.registerFactory(() => GetCurrentUser(sl()));
   sl.registerFactory(() => UpdateUserData(sl()));
   sl.registerFactory(() => DeleteAccount(sl()));
-  // USUNIĘTO DUPLIKATY Signup/Signout z tej sekcji
   sl.registerFactory(() => UpdateUserRole(sl()));
   sl.registerFactory(() => GetAllUsers(sl()));
+  sl.registerFactory(() => GetUserSchedule(sl()));
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -89,6 +90,7 @@ Future<void> init() async {
       signUpForClass: sl(),
       signOutFromClass: sl(),
       authCubit: sl(),
+      getUserSchedule: sl(),
     ),
   );
 

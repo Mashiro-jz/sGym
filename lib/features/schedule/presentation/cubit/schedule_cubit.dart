@@ -1,5 +1,6 @@
 import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/gym_class.dart';
 import '../../domain/usecases/create_gym_class.dart';
@@ -17,6 +18,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   final UpdateGymClass updateGymClass;
   final SignupForClass signUpForClass;
   final SignoutFromClass signOutFromClass;
+  final GetUserSchedule getUserSchedule;
   final AuthCubit authCubit;
 
   DateTime _currentDate = DateTime.now();
@@ -29,6 +31,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     required this.signUpForClass,
     required this.signOutFromClass,
     required this.authCubit,
+    required this.getUserSchedule,
   }) : super(ScheduleInitial());
 
   // 1. Pobieranie
@@ -103,6 +106,16 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       loadSchedule(_currentDate);
     } catch (e) {
       emit(ScheduleError("Nie udało się wypisać z zajęć: $e"));
+    }
+  }
+
+  Future<void> loadUserClasses(String userId) async {
+    emit(ScheduleLoading());
+    try {
+      final classes = await getUserSchedule(userId);
+      emit(ScheduleLoaded(classes));
+    } catch (e) {
+      emit(ScheduleError("Nie udało się pobrać Twoich zajęć: $e"));
     }
   }
 }

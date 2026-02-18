@@ -41,4 +41,10 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   Future<void> signUpForClass(String classId, String userId) {
     return dataSource.signUpForClass(classId, userId);
   }
+
+  @override
+  Future<List<GymClass>> getUserSchedule(String userId) async {
+    final models = await dataSource.getUserSchedule(userId);
+    return models.map((model) => model.toEntity()).toList();
+  }
 }

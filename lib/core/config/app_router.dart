@@ -3,6 +3,7 @@ import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
 import 'package:agym/features/schedule/presentation/pages/add_edit_class_page.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule_page.dart';
+import 'package:agym/features/schedule/presentation/pages/trainer_page.dart';
 import 'package:agym/features/user/presentation/pages/user_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +45,10 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) => const UserProfile(),
         ),
         GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
+        GoRoute(
+          path: '/trainer',
+          builder: (context, state) => const TrainerPage(),
+        ),
         GoRoute(
           path: '/user/settings',
           builder: (context, state) => const ProfileSettingsPage(),
