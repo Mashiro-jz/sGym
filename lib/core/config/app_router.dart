@@ -1,9 +1,9 @@
 import 'package:agym/features/admin/presentation/pages/admin_page.dart';
 import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/pages/add_edit_class_page.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule_page.dart';
-import 'package:agym/features/schedule/presentation/pages/trainer_page.dart';
+import 'package:agym/features/schedule/presentation/pages/schedule/add_edit_class_page.dart';
+import 'package:agym/features/schedule/presentation/pages/schedule/schedule_page.dart';
+import 'package:agym/features/schedule/presentation/pages/trainer/trainer_page.dart';
 import 'package:agym/features/user/presentation/pages/user_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

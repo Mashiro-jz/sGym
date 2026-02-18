@@ -1,6 +1,8 @@
+import 'package:agym/features/schedule/domain/usecases/get_trainer_classes.dart';
 import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:agym/features/schedule/domain/usecases/signout_from_class.dart';
 import 'package:agym/features/schedule/domain/usecases/signup_for_class.dart';
+import 'package:agym/features/schedule/presentation/cubit/trainer_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -54,6 +56,7 @@ Future<void> init() async {
     () => UserCubit(updateUserData: sl(), deleteAccount: sl()),
   );
   sl.registerFactory(() => AdminCubit(getAllUsers: sl(), updateUserRole: sl()));
+  sl.registerFactory(() => TrainerCubit(getTrainerClasses: sl()));
 
   // Use Cases
   sl.registerFactory(() => LoginUser(sl()));
@@ -65,6 +68,7 @@ Future<void> init() async {
   sl.registerFactory(() => UpdateUserRole(sl()));
   sl.registerFactory(() => GetAllUsers(sl()));
   sl.registerFactory(() => GetUserSchedule(sl()));
+  sl.registerFactory(() => GetTrainerClasses(sl()));
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(

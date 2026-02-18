@@ -47,4 +47,10 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
     final models = await dataSource.getUserSchedule(userId);
     return models.map((model) => model.toEntity()).toList();
   }
+
+  @override
+  Future<List<GymClass>> getTrainerClasses(String trainerId) async {
+    final models = await dataSource.getTrainerClasses(trainerId);
+    return models.map((model) => model.toEntity()).toList();
+  }
 }

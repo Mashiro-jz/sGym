@@ -9,6 +9,7 @@ abstract class ScheduleRemoteDataSource {
   Future<void> signUpForClass(String classId, String userId);
   Future<void> signOutFromClass(String classId, String userId);
   Future<List<GymClassModel>> getUserSchedule(String userId);
+  Future<List<GymClassModel>> getTrainerClasses(String trainerId);
 }
 
 class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
@@ -80,6 +81,21 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
         .toList();
 
     classes.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    return classes;
+  }
+
+  @override
+  Future<List<GymClassModel>> getTrainerClasses(String trainerId) async {
+    final snapshot = await firebaseFirestore
+        .collection('classes')
+        .where('trainerId', isEqualTo: trainerId)
+        .where('startTime', isGreaterThanOrEqualTo: DateTime.now())
+        .orderBy('startTime', descending: false)
+        .get();
+    final classes = snapshot.docs
+        .map((doc) => GymClassModel.fromJson(doc.data()))
+        .toList();
 
     return classes;
   }
