@@ -24,7 +24,7 @@ class TrainerPage extends StatelessWidget {
             children: [
               Icon(Icons.lock_outline, size: 64, color: Colors.grey),
               SizedBox(height: 16),
-              Text("Musisz się zalogować, aby zobaczyć ten panel."),
+              Text("Brak dostępu do tego ekranu."),
             ],
           ),
         ),
