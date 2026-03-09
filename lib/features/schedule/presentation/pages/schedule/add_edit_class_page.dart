@@ -40,8 +40,20 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   late TextEditingController _capacityController;
   late TextEditingController _durationController;
 
+  // Domyślnie pokazujemy pełną godzinę przy tworzeniu zajęć
   DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  DateTime now = DateTime.now();
+  late DateTime roundedNextHour = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    now.hour + 1,
+    0,
+    0,
+    0,
+    0,
+  );
+  late TimeOfDay _selectedTime = TimeOfDay.fromDateTime(roundedNextHour);
 
   bool get isEditing => widget.gymClass != null;
 

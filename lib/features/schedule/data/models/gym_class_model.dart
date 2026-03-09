@@ -63,4 +63,15 @@ abstract class GymClassModel with _$GymClassModel {
       registeredUserIds: gymClass.registeredUserIds,
     );
   }
+
+  // Usuwa zajęcia, po 15 dniach od rozpoczęcia
+  Map<String, dynamic> toFirestore() {
+    final map = toJson();
+
+    final expirationDate = startTime.add(const Duration(days: 15));
+
+    map['expireAt'] = Timestamp.fromDate(expirationDate);
+
+    return map;
+  }
 }
