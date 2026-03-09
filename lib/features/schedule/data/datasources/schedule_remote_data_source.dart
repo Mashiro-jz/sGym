@@ -22,7 +22,7 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
     await firebaseFirestore
         .collection('classes')
         .doc(gymClass.id)
-        .set(gymClass.toJson());
+        .set(gymClass.toFirestore());
   }
 
   @override
@@ -52,7 +52,7 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
     await firebaseFirestore
         .collection('classes')
         .doc(gymClass.id)
-        .update(gymClass.toJson());
+        .update(gymClass.toFirestore());
   }
 
   @override
