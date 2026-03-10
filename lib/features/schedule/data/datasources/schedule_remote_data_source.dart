@@ -10,6 +10,7 @@ abstract class ScheduleRemoteDataSource {
   Future<void> signOutFromClass(String classId, String userId);
   Future<List<GymClassModel>> getUserSchedule(String userId);
   Future<List<GymClassModel>> getTrainerClasses(String trainerId);
+  Future<String> getTrainerName(String trainerId);
 }
 
 class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
@@ -98,5 +99,19 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
         .toList();
 
     return classes;
+  }
+
+  @override
+  Future<String> getTrainerName(String trainerId) async {
+    final snapshot = await firebaseFirestore
+        .collection('users')
+        .doc(trainerId)
+        .get();
+    if (snapshot.exists) {
+      final data = snapshot.data() as Map<String, dynamic>;
+      return (data['firstName'] as String?) ?? "Nieznany trener";
+    } else {
+      return "Nieznany trener";
+    }
   }
 }
