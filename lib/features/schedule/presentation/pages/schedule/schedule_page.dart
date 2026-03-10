@@ -158,8 +158,10 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final gymClass = state.classes[index];
+                final trainerName = state.trainerNames[gymClass.trainerId];
                 return _buildModernClassCard(
                   gymClass,
+                  trainerName!,
                   isTrainerOrAdmin,
                   context,
                   currentUserId,
@@ -195,6 +197,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
 
   Widget _buildModernClassCard(
     GymClass gymClass,
+    String trainerName,
     bool isTrainer,
     BuildContext context,
     String currentUserId,
@@ -345,7 +348,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              "Instruktor",
+                              trainerName,
                               style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontSize: 12,

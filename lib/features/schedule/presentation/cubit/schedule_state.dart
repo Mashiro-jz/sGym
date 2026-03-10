@@ -14,11 +14,12 @@ class ScheduleLoading extends ScheduleState {}
 
 class ScheduleLoaded extends ScheduleState {
   final List<GymClass> classes;
+  final Map<String, String> trainerNames;
 
-  const ScheduleLoaded(this.classes);
+  const ScheduleLoaded(this.classes, this.trainerNames);
 
   @override
-  List<Object?> get props => [classes];
+  List<Object?> get props => [classes, trainerNames];
 }
 
 class ScheduleError extends ScheduleState {

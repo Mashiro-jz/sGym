@@ -16,4 +16,6 @@ abstract class ScheduleRepository {
   Future<List<GymClass>> getUserSchedule(String userId);
 
   Future<List<GymClass>> getTrainerClasses(String trainerId);
+
+  Future<String> getTrainerName(String trainerId);
 }

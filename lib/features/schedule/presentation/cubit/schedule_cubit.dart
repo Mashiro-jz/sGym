@@ -1,5 +1,6 @@
 import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:agym/features/auth/domain/usecases/get_trainer_name.dart';
 import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/gym_class.dart';
@@ -19,6 +20,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   final SignupForClass signUpForClass;
   final SignoutFromClass signOutFromClass;
   final GetUserSchedule getUserSchedule;
+  final GetTrainerName getTrainerName;
   final AuthCubit authCubit;
 
   DateTime _currentDate = DateTime.now();
@@ -32,6 +34,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     required this.signOutFromClass,
     required this.authCubit,
     required this.getUserSchedule,
+    required this.getTrainerName,
   }) : super(ScheduleInitial());
 
   // 1. Pobieranie
@@ -40,7 +43,16 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(ScheduleLoading());
     try {
       final classes = await getSchedule(date);
-      emit(ScheduleLoaded(classes));
+      Map<String, String> trainersName = {};
+      for (var scheduleClass in classes) {
+        if (!trainersName.containsKey(scheduleClass.trainerId)) {
+          trainersName[scheduleClass.trainerId] = await getTrainerName(
+            scheduleClass.trainerId,
+          );
+        }
+      }
+
+      emit(ScheduleLoaded(classes, trainersName));
     } catch (e) {
       emit(ScheduleError("Nie udało się pobrać grafiku: $e"));
     }
@@ -113,7 +125,16 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(ScheduleLoading());
     try {
       final classes = await getUserSchedule(userId);
-      emit(ScheduleLoaded(classes));
+      Map<String, String> trainersName = {};
+      for (var scheduleClass in classes) {
+        if (!trainersName.containsKey(scheduleClass.trainerId)) {
+          trainersName[scheduleClass.trainerId] = await getTrainerName(
+            scheduleClass.trainerId,
+          );
+        }
+      }
+
+      emit(ScheduleLoaded(classes, trainersName));
     } catch (e) {
       emit(ScheduleError("Nie udało się pobrać Twoich zajęć: $e"));
     }

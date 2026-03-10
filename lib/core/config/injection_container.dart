@@ -1,5 +1,6 @@
 import 'package:agym/features/auth/domain/usecases/get_users_details.dart';
 import 'package:agym/features/schedule/domain/usecases/get_trainer_classes.dart';
+import 'package:agym/features/auth/domain/usecases/get_trainer_name.dart';
 import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:agym/features/schedule/domain/usecases/signout_from_class.dart';
 import 'package:agym/features/schedule/domain/usecases/signup_for_class.dart';
@@ -96,6 +97,7 @@ Future<void> init() async {
       signOutFromClass: sl(),
       authCubit: sl(),
       getUserSchedule: sl(),
+      getTrainerName: sl(),
     ),
   );
   sl.registerFactory(() => ClassParticipantsCubit(getUsersDetails: sl()));
@@ -109,6 +111,7 @@ Future<void> init() async {
   sl.registerFactory(() => SignoutFromClass(sl()));
   sl.registerFactory(() => GetUserSchedule(sl()));
   sl.registerFactory(() => GetTrainerClasses(sl()));
+  sl.registerFactory(() => GetTrainerName(sl()));
 
   // Repository
   sl.registerLazySingleton<ScheduleRepository>(
