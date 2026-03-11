@@ -75,6 +75,7 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
     final snapshot = await firebaseFirestore
         .collection('classes')
         .where('registeredUserIds', arrayContains: userId)
+        .where('startTime', isGreaterThan: DateTime.now())
         .get();
 
     final classes = snapshot.docs
