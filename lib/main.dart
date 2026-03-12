@@ -1,4 +1,5 @@
 import 'package:agym/core/config/app_router.dart';
+import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => di.sl<AuthCubit>()..checkAuthStatus()),
+        BlocProvider(create: (_) => di.sl<ScheduleCubit>()),
       ],
       child: MaterialApp.router(
         title: 'sGym',

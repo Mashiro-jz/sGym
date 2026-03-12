@@ -74,12 +74,7 @@ class UserProfile extends StatelessWidget {
                   const SizedBox(height: 5),
                   Chip(
                     label: Text(
-                      switch (user.userRole) {
-                        UserRole.manager => "MENADŻER",
-                        UserRole.trainer => "TRENER",
-                        UserRole.cashier => "KASJER",
-                        _ => "KLIENT",
-                      },
+                      user.userRole.value,
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     backgroundColor: user.userRole.color,
