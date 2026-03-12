@@ -57,7 +57,7 @@ class MainWrapper extends StatelessWidget {
         context.go('/home');
         break;
       case 1:
-        context.go('/schedule'); // <--- Przejście do Grafiku
+        context.go('/schedule');
         break;
       case 2:
         context.go('/user');
