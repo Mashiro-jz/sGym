@@ -261,10 +261,6 @@ class _AdminViewState extends State<_AdminView> {
               value: UserRole.cashier,
               child: Text('Zmień na: Kasjer'),
             ),
-            const PopupMenuItem<UserRole>(
-              value: UserRole.manager,
-              child: Text('Zmień na: Menadżer'),
-            ),
           ],
         ),
       ),
