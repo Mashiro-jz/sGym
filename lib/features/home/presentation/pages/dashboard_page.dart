@@ -1,6 +1,7 @@
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
+import 'package:agym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -300,7 +301,15 @@ class _DashboardViewState extends State<DashboardView> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Nawigacja do szczegółów zajęć
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ScheduleDetailsPage(
+                      gymClass: gymClass,
+                      name: trainerName,
+                    ),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
