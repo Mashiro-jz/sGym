@@ -171,7 +171,7 @@ class ScheduleDetailsPage extends StatelessWidget {
               const SizedBox(width: 20),
               _buildHeroIcon(
                 Icons.timer_outlined,
-                "60 min",
+                gymClass.durationMinutes as String,
               ), // TODO: Zmień na faktyczny czas trwania, jeśli masz
             ],
           ),
@@ -250,7 +250,7 @@ class ScheduleDetailsPage extends StatelessWidget {
         children: [
           Text(
             // TODO: Zmień na gymClass.description, jeśli dodasz takie pole do bazy
-            "Intensywny trening ogólnorozwojowy, który angażuje wszystkie partie mięśniowe. Idealny do poprawy kondycji, spalania tkanki tłuszczowej oraz wzmocnienia core'u. Nie zapomnij zabrać ze sobą wody i ręcznika!",
+            gymClass.description,
             style: TextStyle(color: Colors.grey.shade700, height: 1.5),
           ),
           const SizedBox(height: 20),
