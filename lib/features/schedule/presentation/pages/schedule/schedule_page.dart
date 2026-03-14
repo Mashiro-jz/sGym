@@ -216,14 +216,14 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     // TODO: USUNĄĆ KLIKANIE NA ZAJĘCIA, KTÓRE JUŻ SIĘ SKOŃCZYŁY
     // TODO: ZAJĘCIA, KTÓRE JUŻ SIĘ SKOŃCZYŁY DAĆ POD JAKIŚ PRZYCISK, ABY NIE BYŁY WIDOCZNE OD RAZU
     return InkWell(
-      onTap: () => {
+      onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>
                 ScheduleDetailsPage(gymClass: gymClass, name: trainerName),
           ),
-        ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
