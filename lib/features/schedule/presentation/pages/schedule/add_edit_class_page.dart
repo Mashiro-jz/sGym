@@ -39,6 +39,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   late TextEditingController _descriptionController;
   late TextEditingController _capacityController;
   late TextEditingController _durationController;
+  late TextEditingController _categoryController;
 
   // Domyślnie pokazujemy pełną godzinę przy tworzeniu zajęć
   DateTime _selectedDate = DateTime.now();
@@ -64,6 +65,9 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
     _descriptionController = TextEditingController(
       text: widget.gymClass?.description ?? '',
     );
+    _categoryController = TextEditingController(
+      text: widget.gymClass?.category ?? '',
+    );
     _capacityController = TextEditingController(
       text: widget.gymClass?.capacity.toString() ?? '15',
     );
@@ -81,6 +85,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _categoryController.dispose();
     _capacityController.dispose();
     _durationController.dispose();
     super.dispose();
@@ -135,6 +140,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       name: _nameController.text,
       description: _descriptionController.text,
       trainerId: trainerId,
+      category: _categoryController.text,
       startTime: finalDateTime,
       durationMinutes: int.parse(_durationController.text),
       capacity: int.parse(_capacityController.text),
@@ -198,6 +204,16 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   ),
                   maxLines: 4,
                   minLines: 2,
+                ),
+                const SizedBox(height: 15),
+                TextFormField(
+                  controller: _categoryController,
+                  decoration: _inputDecoration(
+                    "Kategoria treningu",
+                    Icons.category,
+                  ),
+                  maxLines: 1,
+                  minLines: 1,
                 ),
 
                 const SizedBox(height: 25),

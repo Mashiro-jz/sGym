@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GymClassModel {
 
- String get id; String get name; String get description; String get trainerId;@TimestampConverter() DateTime get startTime; int get durationMinutes; int get capacity; List<String> get registeredUserIds;
+ String get id; String get name; String get description; String get trainerId; String get category;@TimestampConverter() DateTime get startTime; int get durationMinutes; int get capacity; List<String> get registeredUserIds;
 /// Create a copy of GymClassModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $GymClassModelCopyWith<GymClassModel> get copyWith => _$GymClassModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GymClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.trainerId, trainerId) || other.trainerId == trainerId)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other.registeredUserIds, registeredUserIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GymClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.trainerId, trainerId) || other.trainerId == trainerId)&&(identical(other.category, category) || other.category == category)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other.registeredUserIds, registeredUserIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,trainerId,startTime,durationMinutes,capacity,const DeepCollectionEquality().hash(registeredUserIds));
+int get hashCode => Object.hash(runtimeType,id,name,description,trainerId,category,startTime,durationMinutes,capacity,const DeepCollectionEquality().hash(registeredUserIds));
 
 @override
 String toString() {
-  return 'GymClassModel(id: $id, name: $name, description: $description, trainerId: $trainerId, startTime: $startTime, durationMinutes: $durationMinutes, capacity: $capacity, registeredUserIds: $registeredUserIds)';
+  return 'GymClassModel(id: $id, name: $name, description: $description, trainerId: $trainerId, category: $category, startTime: $startTime, durationMinutes: $durationMinutes, capacity: $capacity, registeredUserIds: $registeredUserIds)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $GymClassModelCopyWith<$Res>  {
   factory $GymClassModelCopyWith(GymClassModel value, $Res Function(GymClassModel) _then) = _$GymClassModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String description, String trainerId,@TimestampConverter() DateTime startTime, int durationMinutes, int capacity, List<String> registeredUserIds
+ String id, String name, String description, String trainerId, String category,@TimestampConverter() DateTime startTime, int durationMinutes, int capacity, List<String> registeredUserIds
 });
 
 
@@ -65,12 +65,13 @@ class _$GymClassModelCopyWithImpl<$Res>
 
 /// Create a copy of GymClassModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? trainerId = null,Object? startTime = null,Object? durationMinutes = null,Object? capacity = null,Object? registeredUserIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? trainerId = null,Object? category = null,Object? startTime = null,Object? durationMinutes = null,Object? capacity = null,Object? registeredUserIds = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,trainerId: null == trainerId ? _self.trainerId : trainerId // ignore: cast_nullable_to_non_nullable
+as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,startTime: null == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
 as int,capacity: null == capacity ? _self.capacity : capacity // ignore: cast_nullable_to_non_nullable
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String trainerId, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String trainerId,  String category, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GymClassModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
+return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.category,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.star
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String trainerId, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String trainerId,  String category, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)  $default,) {final _that = this;
 switch (_that) {
 case _GymClassModel():
-return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
+return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.category,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.star
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String trainerId, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String trainerId,  String category, @TimestampConverter()  DateTime startTime,  int durationMinutes,  int capacity,  List<String> registeredUserIds)?  $default,) {final _that = this;
 switch (_that) {
 case _GymClassModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
+return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.category,_that.startTime,_that.durationMinutes,_that.capacity,_that.registeredUserIds);case _:
   return null;
 
 }
@@ -216,13 +217,14 @@ return $default(_that.id,_that.name,_that.description,_that.trainerId,_that.star
 @JsonSerializable()
 
 class _GymClassModel extends GymClassModel {
-  const _GymClassModel({required this.id, required this.name, required this.description, required this.trainerId, @TimestampConverter() required this.startTime, required this.durationMinutes, required this.capacity, final  List<String> registeredUserIds = const []}): _registeredUserIds = registeredUserIds,super._();
+  const _GymClassModel({required this.id, required this.name, required this.description, required this.trainerId, required this.category, @TimestampConverter() required this.startTime, required this.durationMinutes, required this.capacity, final  List<String> registeredUserIds = const []}): _registeredUserIds = registeredUserIds,super._();
   factory _GymClassModel.fromJson(Map<String, dynamic> json) => _$GymClassModelFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String description;
 @override final  String trainerId;
+@override final  String category;
 @override@TimestampConverter() final  DateTime startTime;
 @override final  int durationMinutes;
 @override final  int capacity;
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GymClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.trainerId, trainerId) || other.trainerId == trainerId)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other._registeredUserIds, _registeredUserIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GymClassModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.trainerId, trainerId) || other.trainerId == trainerId)&&(identical(other.category, category) || other.category == category)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other._registeredUserIds, _registeredUserIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,trainerId,startTime,durationMinutes,capacity,const DeepCollectionEquality().hash(_registeredUserIds));
+int get hashCode => Object.hash(runtimeType,id,name,description,trainerId,category,startTime,durationMinutes,capacity,const DeepCollectionEquality().hash(_registeredUserIds));
 
 @override
 String toString() {
-  return 'GymClassModel(id: $id, name: $name, description: $description, trainerId: $trainerId, startTime: $startTime, durationMinutes: $durationMinutes, capacity: $capacity, registeredUserIds: $registeredUserIds)';
+  return 'GymClassModel(id: $id, name: $name, description: $description, trainerId: $trainerId, category: $category, startTime: $startTime, durationMinutes: $durationMinutes, capacity: $capacity, registeredUserIds: $registeredUserIds)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$GymClassModelCopyWith<$Res> implements $GymClassModelCopy
   factory _$GymClassModelCopyWith(_GymClassModel value, $Res Function(_GymClassModel) _then) = __$GymClassModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String description, String trainerId,@TimestampConverter() DateTime startTime, int durationMinutes, int capacity, List<String> registeredUserIds
+ String id, String name, String description, String trainerId, String category,@TimestampConverter() DateTime startTime, int durationMinutes, int capacity, List<String> registeredUserIds
 });
 
 
@@ -284,12 +286,13 @@ class __$GymClassModelCopyWithImpl<$Res>
 
 /// Create a copy of GymClassModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? trainerId = null,Object? startTime = null,Object? durationMinutes = null,Object? capacity = null,Object? registeredUserIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? trainerId = null,Object? category = null,Object? startTime = null,Object? durationMinutes = null,Object? capacity = null,Object? registeredUserIds = null,}) {
   return _then(_GymClassModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,trainerId: null == trainerId ? _self.trainerId : trainerId // ignore: cast_nullable_to_non_nullable
+as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,startTime: null == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
 as int,capacity: null == capacity ? _self.capacity : capacity // ignore: cast_nullable_to_non_nullable

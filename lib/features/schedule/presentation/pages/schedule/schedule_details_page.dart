@@ -227,9 +227,9 @@ class ScheduleDetailsPage extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              "Fitness & Cardio", // TODO: Jeśli masz kategorie w GymClass, podmień to!
-              style: TextStyle(
+            child: Text(
+              gymClass.category,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -256,7 +256,7 @@ class ScheduleDetailsPage extends StatelessWidget {
               _buildHeroIcon(
                 Icons.timer_outlined,
                 gymClass.durationMinutes.toString(),
-              ), // TODO: Zmień na faktyczny czas trwania, jeśli masz
+              ),
             ],
           ),
         ],
@@ -309,7 +309,7 @@ class ScheduleDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Trener Personalny", // TODO: Zmień, jeśli masz stanowisko trenera w bazie
+                  "Trener Personalny",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
                 ),
               ],
@@ -333,7 +333,6 @@ class ScheduleDetailsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            // TODO: Zmień na gymClass.description, jeśli dodasz takie pole do bazy
             gymClass.description,
             style: TextStyle(color: Colors.grey.shade700, height: 1.5),
           ),
