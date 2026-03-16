@@ -13,6 +13,7 @@ _GymClassModel _$GymClassModelFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       trainerId: json['trainerId'] as String,
       category: json['category'] as String,
+      classLevel: $enumDecode(_$ClassLevelEnumMap, json['classLevel']),
       startTime: const TimestampConverter().fromJson(json['startTime']),
       durationMinutes: (json['durationMinutes'] as num).toInt(),
       capacity: (json['capacity'] as num).toInt(),
@@ -30,8 +31,16 @@ Map<String, dynamic> _$GymClassModelToJson(_GymClassModel instance) =>
       'description': instance.description,
       'trainerId': instance.trainerId,
       'category': instance.category,
+      'classLevel': _$ClassLevelEnumMap[instance.classLevel]!,
       'startTime': const TimestampConverter().toJson(instance.startTime),
       'durationMinutes': instance.durationMinutes,
       'capacity': instance.capacity,
       'registeredUserIds': instance.registeredUserIds,
     };
+
+const _$ClassLevelEnumMap = {
+  ClassLevel.beginner: 'beginner',
+  ClassLevel.intermediate: 'intermediate',
+  ClassLevel.advanced: 'advanced',
+  ClassLevel.allLevels: 'allLevels',
+};

@@ -1,4 +1,5 @@
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/domain/enums/class_level.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -30,6 +31,7 @@ abstract class GymClassModel with _$GymClassModel {
     required String description,
     required String trainerId,
     required String category,
+    required ClassLevel classLevel,
     @TimestampConverter() required DateTime startTime,
     required int durationMinutes,
     required int capacity,
@@ -46,6 +48,7 @@ abstract class GymClassModel with _$GymClassModel {
       description: description,
       trainerId: trainerId,
       category: category,
+      classLevel: classLevel,
       startTime: startTime,
       durationMinutes: durationMinutes,
       capacity: capacity,
@@ -60,6 +63,7 @@ abstract class GymClassModel with _$GymClassModel {
       description: gymClass.description,
       trainerId: gymClass.trainerId,
       category: gymClass.category,
+      classLevel: gymClass.classLevel,
       startTime: gymClass.startTime,
       durationMinutes: gymClass.durationMinutes,
       capacity: gymClass.capacity,

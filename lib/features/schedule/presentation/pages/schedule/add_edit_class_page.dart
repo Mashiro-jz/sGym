@@ -1,4 +1,5 @@
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/domain/enums/class_level.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   late TextEditingController _capacityController;
   late TextEditingController _durationController;
   late TextEditingController _categoryController;
+  ClassLevel _classLevel = ClassLevel.allLevels;
 
   // Domyślnie pokazujemy pełną godzinę przy tworzeniu zajęć
   DateTime _selectedDate = DateTime.now();
@@ -78,6 +80,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
     if (isEditing) {
       _selectedDate = widget.gymClass!.startTime;
       _selectedTime = TimeOfDay.fromDateTime(widget.gymClass!.startTime);
+      _classLevel = widget.gymClass!.classLevel;
     }
   }
 
@@ -141,6 +144,7 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       description: _descriptionController.text,
       trainerId: trainerId,
       category: _categoryController.text,
+      classLevel: _classLevel,
       startTime: finalDateTime,
       durationMinutes: int.parse(_durationController.text),
       capacity: int.parse(_capacityController.text),
@@ -214,6 +218,32 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   ),
                   maxLines: 1,
                   minLines: 1,
+                ),
+                DropdownMenu(
+                  initialSelection: _classLevel,
+                  onSelected: (value) {
+                    setState(() {
+                      _classLevel = value!;
+                    });
+                  },
+                  dropdownMenuEntries: <DropdownMenuEntry<ClassLevel>>[
+                    DropdownMenuEntry(
+                      value: ClassLevel.advanced,
+                      label: "Zaawansowany",
+                    ),
+                    DropdownMenuEntry(
+                      value: ClassLevel.intermediate,
+                      label: "Średnio zaawansowany",
+                    ),
+                    DropdownMenuEntry(
+                      value: ClassLevel.beginner,
+                      label: "Początkujący",
+                    ),
+                    DropdownMenuEntry(
+                      value: ClassLevel.allLevels,
+                      label: "Dla wszystkich",
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 25),

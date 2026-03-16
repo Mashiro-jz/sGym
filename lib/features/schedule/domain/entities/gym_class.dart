@@ -1,3 +1,4 @@
+import 'package:agym/features/schedule/domain/enums/class_level.dart';
 import 'package:equatable/equatable.dart';
 
 class GymClass extends Equatable {
@@ -6,6 +7,7 @@ class GymClass extends Equatable {
   final String description;
   final String trainerId;
   final String category;
+  final ClassLevel classLevel;
   final DateTime startTime;
   final int durationMinutes;
   final int capacity;
@@ -17,6 +19,7 @@ class GymClass extends Equatable {
     required this.description,
     required this.trainerId,
     required this.category,
+    required this.classLevel,
     required this.startTime,
     required this.durationMinutes,
     required this.capacity,
