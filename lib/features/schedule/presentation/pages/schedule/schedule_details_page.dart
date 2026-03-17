@@ -19,6 +19,9 @@ class ScheduleDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sprawdzamy czy zajęcia już się rozpoczęły (lub odbyły w przeszłości)
+    final hasStarted = DateTime.now().isAfter(gymClass.startTime);
+
     return BlocListener<ScheduleCubit, ScheduleState>(
       listener: (context, state) {
         if (state is ScheduleOperationSuccess) {
@@ -96,96 +99,108 @@ class ScheduleDetailsPage extends StatelessWidget {
               const SizedBox(height: 16),
               _buildClassDescription(),
 
-              const SizedBox(height: 100), // Miejsce na pływający przycisk
+              // Jeśli zajęcia się nie zaczęły, dodajemy miejsce na pływający przycisk
+              if (!hasStarted) const SizedBox(height: 100),
             ],
           ),
         ),
 
-        // 4. Pływający przycisk na samym dole ekranu (Zawsze widoczny)
-        bottomSheet: Container(
-          color: Colors.grey.shade50,
-          padding: const EdgeInsets.all(24.0),
-          child: SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              // TODO: ZMIENIĆ NAPIS W ZALEŻNOŚCI OD TEGO CZY JEST ZAPISANY CZY NIE
-              child: BlocBuilder<AuthCubit, AuthState>(
-                builder: (context, authState) {
-                  if (authState is! Authenticated) {
-                    return const SizedBox.shrink();
-                  }
-                  final currentUserId = authState.user.id;
-
-                  return BlocBuilder<ScheduleCubit, ScheduleState>(
-                    builder: (context, scheduleState) {
-                      GymClass currentClass = gymClass;
-                      if (scheduleState is ScheduleLoaded) {
-                        try {
-                          currentClass = scheduleState.classes.firstWhere(
-                            (c) => c.id == gymClass.id,
-                          );
-                        } catch (e) {
-                          // Ignorujemy, jeśli zajęć z jakiegoś powodu nie ma w nowej puli
+        // 4. Pływający przycisk na samym dole ekranu
+        // -> Zwracamy null jeśli zajęcia już się zaczęły (brak panelu dolnego)
+        bottomSheet: hasStarted
+            ? null
+            : Container(
+                color: Colors.grey.shade50,
+                padding: const EdgeInsets.all(24.0),
+                child: SafeArea(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, authState) {
+                        if (authState is! Authenticated) {
+                          return const SizedBox.shrink();
                         }
-                      }
+                        final currentUserId = authState.user.id;
 
-                      final isEnrolled = currentClass.registeredUserIds
-                          .contains(currentUserId); // czy zapisany na zajęcia
-                      final isLoading =
-                          scheduleState
-                              is ScheduleLoading; // czy ładują się zajęcia
+                        return BlocBuilder<ScheduleCubit, ScheduleState>(
+                          builder: (context, scheduleState) {
+                            GymClass currentClass = gymClass;
+                            if (scheduleState is ScheduleLoaded) {
+                              try {
+                                currentClass = scheduleState.classes.firstWhere(
+                                  (c) => c.id == gymClass.id,
+                                );
+                              } catch (e) {
+                                // Ignorujemy, jeśli zajęć z jakiegoś powodu nie ma w nowej puli
+                              }
+                            }
 
-                      return ElevatedButton(
-                        onPressed: isLoading
-                            ? null // Blokujemy przycisk podczas ładowania
-                            : () {
-                                if (isEnrolled) {
-                                  context
-                                      .read<ScheduleCubit>()
-                                      .signOutFromClassActivity(currentClass);
-                                } else {
-                                  context
-                                      .read<ScheduleCubit>()
-                                      .signUpForClassActivity(currentClass);
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isEnrolled
-                              ? Colors.red.shade400
-                              : Colors.deepPurple,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: isLoading ? 0 : 5,
-                        ),
-                        child: isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                            final isEnrolled = currentClass.registeredUserIds
+                                .contains(
+                                  currentUserId,
+                                ); // czy zapisany na zajęcia
+                            final isLoading =
+                                scheduleState
+                                    is ScheduleLoading; // czy ładują się zajęcia
+
+                            // Usunąłem zmienną isScheduleEnded, bo cały bottomSheet w ogóle się nie wyrenderuje,
+                            // jeśli czas już minął.
+
+                            return ElevatedButton(
+                              onPressed: isLoading
+                                  ? null // Blokujemy przycisk podczas ładowania
+                                  : () {
+                                      if (isEnrolled) {
+                                        context
+                                            .read<ScheduleCubit>()
+                                            .signOutFromClassActivity(
+                                              currentClass,
+                                            );
+                                      } else {
+                                        context
+                                            .read<ScheduleCubit>()
+                                            .signUpForClassActivity(
+                                              currentClass,
+                                            );
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isEnrolled
+                                    ? Colors.red.shade400
+                                    : Colors.deepPurple,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                              )
-                            : Text(
-                                isEnrolled
-                                    ? "Wypisz się z zajęć"
-                                    : "Zapisz się na zajęcia",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                elevation: isLoading ? 0 : 5,
                               ),
-                      );
-                    },
-                  );
-                },
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      isEnrolled
+                                          ? "Wypisz się z zajęć"
+                                          : "Zapisz się na zajęcia",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
