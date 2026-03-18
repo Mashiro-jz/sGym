@@ -98,8 +98,10 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        PastClassesPage(gymClasses: pastClasses),
+                    builder: (context) => PastClassesPage(
+                      gymClasses: pastClasses,
+                      trainersNames: currentState.trainerNames,
+                    ),
                   ),
                 );
               } else {

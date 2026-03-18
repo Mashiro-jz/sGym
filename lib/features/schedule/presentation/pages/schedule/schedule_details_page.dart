@@ -22,196 +22,186 @@ class ScheduleDetailsPage extends StatelessWidget {
     // Sprawdzamy czy zajęcia już się rozpoczęły (lub odbyły w przeszłości)
     final hasStarted = DateTime.now().isAfter(gymClass.startTime);
 
-    return BlocListener<ScheduleCubit, ScheduleState>(
-      listener: (context, state) {
-        if (state is ScheduleOperationSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.message,
-              ), // Wiadomość z Cubita ("Zapisano na zajęcia.")
-              backgroundColor: Colors.green, // Zielony kolor sukcesu
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        } else if (state is ScheduleError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red, // Czerwony kolor błędu
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
-        // Nowoczesny, przezroczysty AppBar
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
-            onPressed: () {
-              // Wracamy na poprzedni ekran używając go_router (lub Navigator.pop)
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                // Awaryjny powrót, jeśli z jakiegoś powodu canPop to false
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-          title: const Text(
-            "Szczegóły",
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          centerTitle: true,
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Główna karta z gradientem (Hero)
-              _buildHeroCard(),
-
-              const SizedBox(height: 32),
-
-              // 2. Sekcja z Trenerem
-              const Text(
-                "Prowadzący",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 16),
-              _buildTrainerInfo(),
-
-              const SizedBox(height: 32),
-
-              // 3. Szczegóły (Opis, Intensywność itp.)
-              const Text(
-                "O zajęciach",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 16),
-              _buildClassDescription(),
-
-              // Jeśli zajęcia się nie zaczęły, dodajemy miejsce na pływający przycisk
-              if (!hasStarted) const SizedBox(height: 100),
-            ],
-          ),
+        title: const Text(
+          "Szczegóły",
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeroCard(),
+            const SizedBox(height: 32),
+            const Text(
+              "Prowadzący",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 16),
+            _buildTrainerInfo(),
+            const SizedBox(height: 32),
+            const Text(
+              "O zajęciach",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 16),
+            _buildClassDescription(),
+            if (!hasStarted) const SizedBox(height: 100),
+          ],
+        ),
+      ),
+      bottomSheet: hasStarted
+          ? null
+          : Container(
+              color: Colors.grey.shade50,
+              padding: const EdgeInsets.all(24.0),
+              child: SafeArea(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, authState) {
+                      if (authState is! Authenticated) {
+                        return const SizedBox.shrink();
+                      }
+                      final currentUserId = authState.user.id;
 
-        // 4. Pływający przycisk na samym dole ekranu
-        // -> Zwracamy null jeśli zajęcia już się zaczęły (brak panelu dolnego)
-        bottomSheet: hasStarted
-            ? null
-            : Container(
-                color: Colors.grey.shade50,
-                padding: const EdgeInsets.all(24.0),
-                child: SafeArea(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: BlocBuilder<AuthCubit, AuthState>(
-                      builder: (context, authState) {
-                        if (authState is! Authenticated) {
-                          return const SizedBox.shrink();
-                        }
-                        final currentUserId = authState.user.id;
-
-                        return BlocBuilder<ScheduleCubit, ScheduleState>(
-                          builder: (context, scheduleState) {
-                            GymClass currentClass = gymClass;
-                            if (scheduleState is ScheduleLoaded) {
-                              try {
-                                currentClass = scheduleState.classes.firstWhere(
-                                  (c) => c.id == gymClass.id,
-                                );
-                              } catch (e) {
-                                // Ignorujemy, jeśli zajęć z jakiegoś powodu nie ma w nowej puli
-                              }
+                      return BlocBuilder<ScheduleCubit, ScheduleState>(
+                        builder: (context, scheduleState) {
+                          GymClass currentClass = gymClass;
+                          if (scheduleState is ScheduleLoaded) {
+                            try {
+                              currentClass = scheduleState.classes.firstWhere(
+                                (c) => c.id == gymClass.id,
+                              );
+                            } catch (e) {
+                              // Ignorujemy, jeśli zajęć z jakiegoś powodu nie ma w nowej puli
                             }
+                          }
 
-                            final isEnrolled = currentClass.registeredUserIds
-                                .contains(
-                                  currentUserId,
-                                ); // czy zapisany na zajęcia
-                            final isLoading =
-                                scheduleState
-                                    is ScheduleLoading; // czy ładują się zajęcia
+                          final isEnrolled = currentClass.registeredUserIds
+                              .contains(currentUserId);
+                          final isLoading = scheduleState is ScheduleLoading;
 
-                            // Usunąłem zmienną isScheduleEnded, bo cały bottomSheet w ogóle się nie wyrenderuje,
-                            // jeśli czas już minął.
+                          return ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    // 1. Czyścimy stare powiadomienia
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).hideCurrentSnackBar();
 
-                            return ElevatedButton(
-                              onPressed: isLoading
-                                  ? null // Blokujemy przycisk podczas ładowania
-                                  : () {
+                                    try {
                                       if (isEnrolled) {
-                                        context
+                                        // 2. Czekamy na zakończenie akcji w Cubicie
+                                        await context
                                             .read<ScheduleCubit>()
                                             .signOutFromClassActivity(
                                               currentClass,
                                             );
+                                        // 3. Pokazujemy SnackBar bezpośrednio z przycisku (po wykonaniu akcji)
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            _buildModernSnackBar(
+                                              "Wypisano z zajęć.",
+                                              isSuccess: true,
+                                            ),
+                                          );
+                                        }
                                       } else {
-                                        context
+                                        await context
                                             .read<ScheduleCubit>()
                                             .signUpForClassActivity(
                                               currentClass,
                                             );
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            _buildModernSnackBar(
+                                              "Zapisano na zajęcia.",
+                                              isSuccess: true,
+                                            ),
+                                          );
+                                        }
                                       }
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isEnrolled
-                                    ? Colors.red.shade400
-                                    : Colors.deepPurple,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: isLoading ? 0 : 5,
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          _buildModernSnackBar(
+                                            "Wystąpił błąd.",
+                                            isSuccess: false,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isEnrolled
+                                  ? Colors.red.shade400
+                                  : Colors.deepPurple,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(
-                                      isEnrolled
-                                          ? "Wypisz się z zajęć"
-                                          : "Zapisz się na zajęcia",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              elevation: isLoading ? 0 : 5,
+                            ),
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
                                     ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                                  )
+                                : Text(
+                                    isEnrolled
+                                        ? "Wypisz się z zajęć"
+                                        : "Zapisz się na zajęcia",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 
   // --- WIDŻETY POMOCNICZE ---
 
   Widget _buildHeroCard() {
-    // Formatowanie czasu, by ładnie wyglądał (np. 18:05)
     final timeString =
         "${gymClass.startTime.hour}:${gymClass.startTime.minute.toString().padLeft(2, '0')}";
-    // Formatowanie daty (np. 12.10.2023)
     final dateString =
         "${gymClass.startTime.day.toString().padLeft(2, '0')}.${gymClass.startTime.month.toString().padLeft(2, '0')}.${gymClass.startTime.year}";
 
@@ -357,10 +347,7 @@ class ScheduleDetailsPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildInfoColumn(
-                "Poziom",
-                "Średni",
-              ), // TODO: Dynamizuj w przyszłości
+              _buildInfoColumn("Poziom", gymClass.classLevel.displayName),
               _buildInfoColumn("Spalanie", "~450 kcal"),
               _buildInfoColumn("Sala", "Główna"),
             ],
@@ -384,6 +371,38 @@ class ScheduleDetailsPage extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
       ],
+    );
+  }
+
+  // --- NOWY, NOWOCZESNY SNACKBAR ---
+  SnackBar _buildModernSnackBar(String message, {required bool isSuccess}) {
+    return SnackBar(
+      content: Row(
+        children: [
+          Icon(
+            isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: isSuccess ? Colors.green.shade600 : Colors.red.shade500,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.only(bottom: 90, left: 24, right: 24),
+      duration: const Duration(milliseconds: 1500),
+      elevation: 8,
     );
   }
 }

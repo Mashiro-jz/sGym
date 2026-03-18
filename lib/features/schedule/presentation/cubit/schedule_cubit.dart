@@ -101,10 +101,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       emit(ScheduleLoading());
       await signUpForClass(gymClass, currentUser.user.id);
       emit(const ScheduleOperationSuccess("Zapisano na zajęcia."));
-      loadSchedule(_currentDate);
+
+      // POPRAWKA: Używamy dokładnej daty modyfikowanych zajęć!
+      await loadSchedule(gymClass.startTime);
     } catch (e) {
       emit(ScheduleError("Nie udało się zapisać na zajęcia: $e"));
-      loadSchedule(gymClass.startTime);
+      await loadSchedule(gymClass.startTime);
     }
   }
 
@@ -115,9 +117,11 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       emit(ScheduleLoading());
       await signOutFromClass(gymClass, currentUser.user.id);
       emit(const ScheduleOperationSuccess("Wypisano z zajęć."));
-      loadSchedule(_currentDate);
+
+      await loadSchedule(gymClass.startTime);
     } catch (e) {
       emit(ScheduleError("Nie udało się wypisać z zajęć: $e"));
+      await loadSchedule(gymClass.startTime);
     }
   }
 

@@ -8,8 +8,13 @@ import '../../../../auth/presentation/cubit/auth_state.dart';
 
 class PastClassesPage extends StatelessWidget {
   final List<GymClass> gymClasses;
+  final Map<String, String> trainersNames;
 
-  const PastClassesPage({super.key, required this.gymClasses});
+  const PastClassesPage({
+    super.key,
+    required this.gymClasses,
+    required this.trainersNames,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +47,12 @@ class PastClassesPage extends StatelessWidget {
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final gymClass = gymClasses[index];
+                final trainerName = trainersNames[gymClass.trainerId];
 
                 return ModernClassCard(
                   gymClass: gymClass,
                   // TODO: Jeśli chcesz mieć tu prawdziwe imię, musimy przekazać mapę z poprzedniego ekranu
-                  trainerName: "Twój Trener",
+                  trainerName: trainerName ?? "Nieznany trener",
 
                   // Ważne: Wymuszamy 'false', żeby nawet Trener
                   // nie mógł edytować i usuwać zajęć z poziomu historii!
