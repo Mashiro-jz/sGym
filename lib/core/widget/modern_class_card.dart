@@ -62,11 +62,15 @@ class ModernClassCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        final currentScheduleCubit = context.read<ScheduleCubit>();
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ScheduleDetailsPage(gymClass: gymClass, name: trainerName),
+            builder: (context) => BlocProvider.value(
+              value: currentScheduleCubit,
+              child: ScheduleDetailsPage(gymClass: gymClass, name: trainerName),
+            ),
           ),
         );
       },

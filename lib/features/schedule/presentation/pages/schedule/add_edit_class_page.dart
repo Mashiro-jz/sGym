@@ -219,29 +219,48 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   maxLines: 1,
                   minLines: 1,
                 ),
-                DropdownMenu(
-                  initialSelection: _classLevel,
-                  onSelected: (value) {
-                    setState(() {
-                      _classLevel = value!;
-                    });
+                const SizedBox(
+                  height: 15,
+                ), // Dodajemy odstęp od poprzedniego pola
+                DropdownButtonFormField<ClassLevel>(
+                  initialValue: _classLevel,
+                  // Używamy Twojej własnej metody do stylizacji!
+                  decoration: _inputDecoration(
+                    "Poziom zaawansowania",
+                    Icons.leaderboard, // Ikonka pasująca do poziomów
+                  ),
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.deepPurple,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    12,
+                  ), // Zaokrągla rogi rozwijanej listy
+                  dropdownColor: Colors.white, // Czyste, białe tło dla menu
+                  elevation: 4,
+                  onChanged: (ClassLevel? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _classLevel = newValue;
+                      });
+                    }
                   },
-                  dropdownMenuEntries: <DropdownMenuEntry<ClassLevel>>[
-                    DropdownMenuEntry(
+                  items: const [
+                    DropdownMenuItem(
                       value: ClassLevel.advanced,
-                      label: "Zaawansowany",
+                      child: Text("Zaawansowany"),
                     ),
-                    DropdownMenuEntry(
+                    DropdownMenuItem(
                       value: ClassLevel.intermediate,
-                      label: "Średnio zaawansowany",
+                      child: Text("Średnio zaawansowany"),
                     ),
-                    DropdownMenuEntry(
+                    DropdownMenuItem(
                       value: ClassLevel.beginner,
-                      label: "Początkujący",
+                      child: Text("Początkujący"),
                     ),
-                    DropdownMenuEntry(
+                    DropdownMenuItem(
                       value: ClassLevel.allLevels,
-                      label: "Dla wszystkich",
+                      child: Text("Dla wszystkich"),
                     ),
                   ],
                 ),
