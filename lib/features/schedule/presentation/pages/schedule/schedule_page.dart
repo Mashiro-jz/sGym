@@ -2,6 +2,7 @@ import 'package:agym/core/widget/modern_class_card.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule/past_classes_page.dart';
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -33,6 +34,31 @@ class _SchedulePageView extends StatefulWidget {
 
 class _SchedulePageViewState extends State<_SchedulePageView> {
   DateTime _selectedDate = DateTime.now();
+  List<String> _selectedFilters = []; // Lista przechowująca zaznaczone filtry
+
+  void _openFilterDelegate(List<String> allAvailableFilters) async {
+    await FilterListDelegate.show<String>(
+      context: context,
+      list: allAvailableFilters,
+      selectedListData: _selectedFilters,
+      theme: FilterListDelegateThemeData(
+        listTileTheme: const ListTileThemeData(
+          selectedColor: Colors.deepPurple,
+        ),
+      ),
+      onItemSearch: (filter, query) {
+        return filter.toLowerCase().contains(query.toLowerCase());
+      },
+      tileLabel: (filter) => filter,
+      emptySearchChild: const Center(child: Text("Brak wyników")),
+      searchFieldHint: "Szukaj...",
+      onApplyButtonClick: (list) {
+        setState(() {
+          _selectedFilters = list ?? [];
+        });
+      },
+    );
+  }
 
   Future<void> _pickDate() async {
     final newDate = await showDatePicker(
@@ -112,8 +138,49 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                 );
               }
             },
-            icon: Icon(Icons.calendar_month),
+            icon: const Icon(Icons.history),
             tooltip: "Zajęcia zakończone",
+          ),
+          IconButton(
+            onPressed: () {
+              // Pobieramy filtry tylko dla nadchodzących zajęć
+              final currentState = context.read<ScheduleCubit>().state;
+              if (currentState is ScheduleLoaded) {
+                final upcoming = currentState.classes
+                    .where((c) => c.startTime.isAfter(DateTime.now()))
+                    .toList();
+                final categories = upcoming.map((e) => e.category).toSet();
+                final levels = upcoming
+                    .map((e) => e.classLevel.displayName)
+                    .toSet();
+
+                _openFilterDelegate([...categories, ...levels]);
+              }
+            },
+            icon: Stack(
+              children: [
+                // TODO: Przetestuj filtrowanie oraz niech Ci chat wytłumaczy wszystko oraz nauczy korzystać z dokumentacji i gdzie ją znaleźć
+                const Icon(Icons.filter_alt_outlined),
+                // Mała czerwona kropka, jeśli jakiś filtr jest aktywny!
+                if (_selectedFilters.isNotEmpty)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 10,
+                        minHeight: 10,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            tooltip: "Filtruj zajęcia",
           ),
         ],
       ),
@@ -154,14 +221,33 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
           if (state is ScheduleLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ScheduleLoaded) {
-            final upComingClasses = state.classes.where((gymClass) {
+            var upComingClasses = state.classes.where((gymClass) {
               return gymClass.startTime.isAfter(DateTime.now());
             }).toList();
 
-            if (upComingClasses.isEmpty) {
-              return _buildEmptyState();
+            // Aplikujemy wybrane filtry
+            if (_selectedFilters.isNotEmpty) {
+              upComingClasses = upComingClasses.where((gymClass) {
+                final hasCategory = _selectedFilters.contains(
+                  gymClass.category,
+                );
+                final hasLevel = _selectedFilters.contains(
+                  gymClass.classLevel.displayName,
+                );
+                return hasCategory || hasLevel;
+              }).toList();
             }
 
+            if (upComingClasses.isEmpty) {
+              return _selectedFilters.isNotEmpty
+                  ? const Center(
+                      child: Text("Brak zajęć dla podanych filtrów."),
+                    )
+                  : _buildEmptyState();
+            }
+
+            // TUTEJ BYŁ BŁĄD! Zwracałeś text "Wczytywanie..." zamiast listy kafelków!
+            // Przywrócona funkcja renderowania:
             return ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: upComingClasses.length,
@@ -179,7 +265,8 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               },
             );
           }
-          return const Center(child: Text("Wczytywanie..."));
+
+          return const Center(child: Text("Wystąpił błąd wczytywania."));
         },
       ),
     );

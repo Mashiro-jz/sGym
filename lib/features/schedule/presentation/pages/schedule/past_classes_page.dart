@@ -51,7 +51,6 @@ class PastClassesPage extends StatelessWidget {
 
                 return ModernClassCard(
                   gymClass: gymClass,
-                  // TODO: Jeśli chcesz mieć tu prawdziwe imię, musimy przekazać mapę z poprzedniego ekranu
                   trainerName: trainerName ?? "Nieznany trener",
 
                   // Ważne: Wymuszamy 'false', żeby nawet Trener
