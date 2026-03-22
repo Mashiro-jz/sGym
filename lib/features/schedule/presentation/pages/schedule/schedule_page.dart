@@ -1,4 +1,5 @@
 import 'package:agym/core/widget/modern_class_card.dart';
+import 'package:agym/features/schedule/domain/enums/class_level.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule/past_classes_page.dart';
@@ -35,26 +36,35 @@ class _SchedulePageView extends StatefulWidget {
 class _SchedulePageViewState extends State<_SchedulePageView> {
   DateTime _selectedDate = DateTime.now();
   List<String> _selectedFilters = []; // Lista przechowująca zaznaczone filtry
+  final List<String> _allAvailableFilters = ClassLevel.values
+      .map((e) => e.displayName)
+      .toList();
 
-  void _openFilterDelegate(List<String> allAvailableFilters) async {
-    await FilterListDelegate.show<String>(
-      context: context,
-      list: allAvailableFilters,
+  void _openFilterDelegate() async {
+    await FilterListDialog.display<String>(
+      context,
+      listData: _allAvailableFilters,
       selectedListData: _selectedFilters,
-      theme: FilterListDelegateThemeData(
-        listTileTheme: const ListTileThemeData(
-          selectedColor: Colors.deepPurple,
-        ),
-      ),
+      headlineText: "Filtruj poziomy",
+      applyButtonText: "Zatwierdź",
+      choiceChipLabel: (filter) => filter,
+
+      validateSelectedItem: (list, item) {
+        return list != null && list.contains(item);
+      },
+
       onItemSearch: (filter, query) {
         return filter.toLowerCase().contains(query.toLowerCase());
       },
-      tileLabel: (filter) => filter,
-      emptySearchChild: const Center(child: Text("Brak wyników")),
-      searchFieldHint: "Szukaj...",
+
       onApplyButtonClick: (list) {
         setState(() {
-          _selectedFilters = list ?? [];
+          _selectedFilters = list != null ? List.from(list) : [];
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            Navigator.of(context, rootNavigator: true).pop();
+          }
         });
       },
     );
@@ -142,21 +152,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             tooltip: "Zajęcia zakończone",
           ),
           IconButton(
-            onPressed: () {
-              // Pobieramy filtry tylko dla nadchodzących zajęć
-              final currentState = context.read<ScheduleCubit>().state;
-              if (currentState is ScheduleLoaded) {
-                final upcoming = currentState.classes
-                    .where((c) => c.startTime.isAfter(DateTime.now()))
-                    .toList();
-                final categories = upcoming.map((e) => e.category).toSet();
-                final levels = upcoming
-                    .map((e) => e.classLevel.displayName)
-                    .toSet();
-
-                _openFilterDelegate([...categories, ...levels]);
-              }
-            },
+            onPressed: () => _openFilterDelegate(),
             icon: Stack(
               children: [
                 // TODO: Przetestuj filtrowanie oraz niech Ci chat wytłumaczy wszystko oraz nauczy korzystać z dokumentacji i gdzie ją znaleźć
