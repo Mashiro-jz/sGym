@@ -36,17 +36,26 @@ class TrainerPage extends StatelessWidget {
       create: (context) =>
           di.sl<TrainerCubit>()..loadTrainerClasses(authState.user.id),
       child: Scaffold(
-        backgroundColor: Colors.grey[100], // Jasne tło dla kontrastu kart
+        backgroundColor: Colors.grey.shade50, // Jasne, nowoczesne tło
         appBar: AppBar(
-          title: const Text("Panel Trenera"),
+          title: const Text(
+            "Panel Trenera",
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.blueAccent, // Lub Twój kolor główny
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: Colors.black87),
         ),
         body: BlocBuilder<TrainerCubit, TrainerState>(
           builder: (BuildContext context, TrainerState state) {
             if (state is TrainerLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.deepPurple),
+              );
             }
 
             if (state is TrainerError) {
@@ -56,19 +65,40 @@ class TrainerPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.redAccent,
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red.shade400,
+                        ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       Text(
                         state.message,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontSize: 16,
+                        ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 12,
+                          ),
+                        ),
                         onPressed: () {
                           context.read<TrainerCubit>().loadTrainerClasses(
                             authState.user.id,
@@ -90,6 +120,7 @@ class TrainerPage extends StatelessWidget {
 
               // Lista zajęć z możliwością odświeżania (Pull-to-refresh)
               return RefreshIndicator(
+                color: Colors.deepPurple,
                 onRefresh: () async {
                   context.read<TrainerCubit>().loadTrainerClasses(
                     authState.user.id,
@@ -115,10 +146,10 @@ class TrainerPage extends StatelessWidget {
 
   // Widget pomocniczy: Karta pojedynczych zajęć
   Widget _buildClassCard(dynamic gymClass, BuildContext context) {
-    // Formatowanie daty i godziny (możesz użyć pakietu intl dla lepszego efektu)
+    // Formatowanie daty i godziny
     final date = gymClass.startTime;
     final String dayString =
-        "${date.day}.${date.month.toString().padLeft(2, '0')}";
+        "${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}";
     final String timeString =
         "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
 
@@ -126,19 +157,22 @@ class TrainerPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20), // Mocniejsze zaokrąglenie
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: 0.03,
+            ), // Bardzo delikatny cień
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           onTap: () {
             Navigator.push(
               context,
@@ -159,11 +193,8 @@ class TrainerPage extends StatelessWidget {
                     horizontal: 16,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blueAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.blueAccent.withValues(alpha: 0.3),
-                    ),
+                    color: Colors.deepPurple.shade50, // Fioletowe tło pigułki
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
                     children: [
@@ -171,8 +202,8 @@ class TrainerPage extends StatelessWidget {
                         timeString,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.blueAccent,
+                          fontSize: 16,
+                          color: Colors.deepPurple,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -180,7 +211,8 @@ class TrainerPage extends StatelessWidget {
                         dayString,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.blueAccent.shade700,
+                          color: Colors.deepPurple.shade300,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -204,14 +236,14 @@ class TrainerPage extends StatelessWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.fitness_center,
                             size: 14,
-                            color: Colors.grey,
+                            color: Colors.grey.shade400,
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            "Zajęcia grupowe", // Możesz tu dać dynamiczny typ zajęć
+                            gymClass.category, // Dynamiczna kategoria z bazy
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -227,7 +259,7 @@ class TrainerPage extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: Colors.grey[400],
+                  color: Colors.grey[300],
                 ),
               ],
             ),
@@ -246,18 +278,29 @@ class TrainerPage extends StatelessWidget {
           Icon(
             Icons.calendar_today_outlined,
             size: 80,
-            color: Colors.grey[300],
+            color: Colors.deepPurple.withValues(alpha: 0.1),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             "Brak zaplanowanych zajęć",
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          const SizedBox(height: 8),
-          TextButton(
+          const SizedBox(height: 16),
+          TextButton.icon(
             onPressed: () =>
                 context.read<TrainerCubit>().loadTrainerClasses(userId),
-            child: const Text("Odśwież"),
+            icon: const Icon(Icons.refresh, color: Colors.deepPurple),
+            label: const Text(
+              "Odśwież",
+              style: TextStyle(
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
