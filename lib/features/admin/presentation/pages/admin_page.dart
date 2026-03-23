@@ -1,4 +1,5 @@
 import 'package:agym/core/utils/user_role_extensions.dart';
+import 'package:agym/core/widget/modern_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/injection_container.dart' as di;
@@ -32,22 +33,44 @@ class _AdminViewState extends State<_AdminView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text("Admin Panel"),
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
+        title: const Text(
+          "Admin Panel",
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
+        centerTitle: true,
       ),
       body: BlocBuilder<AdminCubit, AdminState>(
         builder: (context, state) {
           if (state is AdminLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.deepPurple),
+            );
           }
 
           if (state is AdminError) {
             return Center(
-              child: Text(
-                state.message,
-                style: const TextStyle(color: Colors.red),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Colors.red.shade300,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -78,30 +101,27 @@ class _AdminViewState extends State<_AdminView> {
               children: [
                 // SEKCJA 1: Statystyki (Karty na górze)
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: Row(
                     children: [
-                      // Usunąłem "Wszyscy", żeby zmieścić 4 kafelki ról,
-                      // albo można zostawić "Wszyscy" i użyć mniejszego paddingu/fontu.
-                      // Tutaj zostawiam "Wszyscy" i dodaję Kasjerów.
                       _buildStatCard(
                         "Wszyscy",
                         totalUsers.toString(),
                         Colors.blueGrey,
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 8),
                       _buildStatCard(
                         "Trenerzy",
                         trainersCount.toString(),
                         Colors.orange,
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 8),
                       _buildStatCard(
                         "Kasjerzy",
                         cashiersCount.toString(),
                         Colors.green,
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 8),
                       _buildStatCard(
                         "Klienci",
                         clientsCount.toString(),
@@ -115,10 +135,28 @@ class _AdminViewState extends State<_AdminView> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Szukaj użytkownika...",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: "Szukaj użytkownika...",
+                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.grey.shade500,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                      ),
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -128,17 +166,22 @@ class _AdminViewState extends State<_AdminView> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
 
                 // SEKCJA 3: Lista
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-                      return _buildUserTile(context, user);
-                    },
-                  ),
+                  child: filteredUsers.isEmpty
+                      ? _buildEmptySearchState()
+                      : ListView.separated(
+                          padding: const EdgeInsets.only(top: 8, bottom: 24),
+                          itemCount: filteredUsers.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final user = filteredUsers[index];
+                            return _buildUserTile(context, user);
+                          },
+                        ),
                 ),
               ],
             );
@@ -151,28 +194,33 @@ class _AdminViewState extends State<_AdminView> {
   }
 
   // Kafelki Statystyk
-  Widget _buildStatCard(String title, String count, Color color) {
+  Widget _buildStatCard(String title, String count, MaterialColor color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1), // Delikatne tło
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
+          color: color.shade50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.shade100),
         ),
         child: Column(
           children: [
             Text(
               count,
               style: TextStyle(
-                fontSize: 20, // Trochę mniejszy font, żeby się zmieściło
-                fontWeight: FontWeight.bold,
-                color: color,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: color.shade700,
               ),
             ),
+            const SizedBox(height: 2),
             Text(
               title,
-              style: TextStyle(fontSize: 10, color: color), // Mniejszy opis
+              style: TextStyle(
+                fontSize: 10,
+                color: color.shade600,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -183,69 +231,92 @@ class _AdminViewState extends State<_AdminView> {
     );
   }
 
+  // Pusty stan wyszukiwania
+  Widget _buildEmptySearchState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(
+            "Nie znaleziono użytkownika",
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Kafelek Użytkownika na liście
   Widget _buildUserTile(BuildContext context, User user) {
-    // Pomocnicza funkcja do wyświetlania inicjałów (żeby nie kopiować kodu)
-    Widget buildInitials() {
-      return Center(
-        child: Text(
-          user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : "?",
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
-    }
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: user.userRole.color,
-          child: (user.photoUrl != null && user.photoUrl!.isNotEmpty)
-              ? Image.network(
-                  user.photoUrl!,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Błąd ładowania obrazka -> pokaż inicjały
-                    return buildInitials();
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const CircularProgressIndicator(strokeWidth: 2);
-                  },
-                )
-              : buildInitials(),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: ModernUserAvatar(
+          firstName: user.firstName,
+          lastName: user.lastName,
+          photoUrl: user.photoUrl,
         ),
-        title: Text("${user.firstName} ${user.lastName}"),
+        title: Text(
+          "${user.firstName} ${user.lastName}",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(user.email, style: const TextStyle(fontSize: 12)),
+            const SizedBox(height: 2),
+            Text(
+              user.email,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
             Container(
-              margin: const EdgeInsets.only(top: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: user.userRole.color.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(4),
+                color: user.userRole.color,
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 user.userRole.displayName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: user.userRole.color,
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
         ),
         trailing: PopupMenuButton<UserRole>(
-          icon: const Icon(Icons.more_vert),
+          icon: Icon(Icons.more_vert, color: Colors.grey.shade400),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           onSelected: (UserRole newRole) {
             context.read<AdminCubit>().updateUserRoleAction(
               uid: user.id,
               newRole: newRole,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Zmieniono rolę na: ${newRole.displayName}"),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
             );
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<UserRole>>[

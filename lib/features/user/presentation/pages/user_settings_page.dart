@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/config/injection_container.dart' as di;
 import '../../../../core/enums/sex_role.dart';
 import '../../../../core/utils/sex_role_extensions.dart';
+import '../../../../core/widget/modern_user_avatar.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../cubit/user_cubit.dart';
@@ -15,7 +16,6 @@ class ProfileSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Wstrzykujemy UserCubit (odpowiedzialny za zapis i usuwanie)
     return BlocProvider(
       create: (context) => di.sl<UserCubit>(),
       child: const _ProfileSettingsView(),
@@ -33,16 +33,13 @@ class _ProfileSettingsView extends StatefulWidget {
 class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
   final _formKey = GlobalKey<FormState>();
 
-  // Kontrolery formularza
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
 
-  // Zmienna dla wybranej płci
   SexRole? _selectedSex;
 
-  // Funkcja pokazująca okno potwierdzenia usunięcia konta
   void _showDeleteConfirmationDialog(BuildContext context) {
     final passwordController = TextEditingController();
 
@@ -50,42 +47,60 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text("Usuń konto"),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.red.shade400),
+              const SizedBox(width: 8),
+              const Text("Usuń konto"),
+            ],
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 "Tej operacji nie można cofnąć. Wszystkie Twoje dane zostaną trwale usunięte.",
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.grey.shade700),
               ),
               const SizedBox(height: 20),
-              const Text("Aby potwierdzić, wpisz swoje hasło:"),
+              const Text(
+                "Aby potwierdzić, wpisz swoje hasło:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Hasło",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: _buildInputDecoration("Hasło", Icons.lock_outline),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext), // Anuluj
-              child: const Text("Anuluj"),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Anuluj", style: TextStyle(color: Colors.grey)),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () {
-                // Wywołujemy usuwanie w Cubicie
                 context.read<UserCubit>().deleteUserAccount(
                   passwordController.text,
                 );
-                Navigator.pop(dialogContext); // Zamykamy dialog
+                Navigator.pop(dialogContext);
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text("USUŃ NA ZAWSZE"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade50,
+                foregroundColor: Colors.red.shade700,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "USUŃ KONTO",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -96,7 +111,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
   @override
   void initState() {
     super.initState();
-    // 2. Pobieramy aktualne dane zalogowanego użytkownika z AuthCubit
     final authState = context.read<AuthCubit>().state;
 
     if (authState is Authenticated) {
@@ -107,7 +121,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       _emailController = TextEditingController(text: user.email);
       _selectedSex = user.sexRole;
     } else {
-      // Zabezpieczenie
       _firstNameController = TextEditingController();
       _lastNameController = TextEditingController();
       _phoneController = TextEditingController();
@@ -125,7 +138,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
     super.dispose();
   }
 
-  // Funkcja zapisu danych
   void _saveProfile(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       final authState = context.read<AuthCubit>().state;
@@ -146,28 +158,53 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
     }
   }
 
+  // --- POMOCNICZY WIDŻET DEKORACJI PÓL TEXTOWYCH ---
+  InputDecoration _buildInputDecoration(
+    String label,
+    IconData icon, {
+    bool isReadOnly = false,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.grey.shade600),
+      prefixIcon: Icon(
+        icon,
+        color: isReadOnly ? Colors.grey : Colors.deepPurple,
+      ),
+      filled: true,
+      fillColor: isReadOnly ? Colors.grey.shade200 : Colors.grey.shade100,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: Colors.red.shade300, width: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 3. Nasłuchujemy zmian w UserCubit
     return BlocConsumer<UserCubit, UserState>(
       listener: (context, state) {
         if (state is UserDataUpdateSuccess) {
-          // A. Sukces aktualizacji
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Profil zaktualizowany pomyślnie!"),
               backgroundColor: Colors.green,
             ),
           );
-          context.read<AuthCubit>().checkAuthStatus(); // Odśwież AuthCubit
+          context.read<AuthCubit>().checkAuthStatus();
           context.pop();
         } else if (state is UserAccountDeleted) {
-          // B. Sukces usunięcia konta
-          context.pop(); // Zamknij SettingsPage
-          context.read<AuthCubit>().logout(); // Wyloguj z aplikacji
-          // Router sam przeniesie do /login
+          context.pop();
+          context.read<AuthCubit>().logout();
         } else if (state is UserError) {
-          // C. Błąd
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
@@ -177,10 +214,18 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
         final isLoading = state is UserLoading;
 
         return Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text("Edytuj Profil"),
-            backgroundColor: Colors.blueGrey,
-            foregroundColor: Colors.white,
+            title: const Text(
+              "Edytuj Profil",
+              style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.black87),
             actions: [
               if (isLoading)
                 const Padding(
@@ -189,14 +234,18 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: Colors.deepPurple,
                       strokeWidth: 2,
                     ),
                   ),
                 )
               else
                 IconButton(
-                  icon: const Icon(Icons.check),
+                  icon: const Icon(
+                    Icons.check_circle,
+                    color: Colors.deepPurple,
+                    size: 28,
+                  ),
                   onPressed: () => _saveProfile(context),
                   tooltip: "Zapisz",
                 ),
@@ -208,143 +257,146 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                 final user = authState.user;
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- SEKCJA ZDJĘCIA (Wizualna) ---
+                        // --- ZDJĘCIE PROFILOWE ---
                         Center(
                           child: Stack(
+                            alignment: Alignment.bottomRight,
                             children: [
-                              CircleAvatar(
-                                radius: 60,
-                                backgroundColor: Colors.blueGrey.shade100,
-                                backgroundImage:
-                                    (user.photoUrl != null &&
-                                        user.photoUrl!.isNotEmpty)
-                                    ? NetworkImage(user.photoUrl!)
-                                    : null,
-                                child:
-                                    (user.photoUrl == null ||
-                                        user.photoUrl!.isEmpty)
-                                    ? Text(
-                                        user.firstName.isNotEmpty
-                                            ? user.firstName[0].toUpperCase()
-                                            : "?",
-                                        style: const TextStyle(
-                                          fontSize: 40,
-                                          color: Colors.blueGrey,
-                                        ),
-                                      )
-                                    : null,
+                              ModernUserAvatar(
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                photoUrl: user.photoUrl,
+                                radius: 56,
+                                fontSize: 36,
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  radius: 20,
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.camera_alt,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Zmiana zdjęcia - wkrótce!",
-                                          ),
-                                        ),
-                                      );
-                                    },
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
                                   ),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.camera_alt,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Zmiana zdjęcia - wkrótce!",
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 40),
 
-                        // --- POLA FORMULARZA ---
+                        const Text(
+                          "Dane konta (tylko do odczytu)",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
                         TextFormField(
                           initialValue: user.id,
                           readOnly: true,
-                          decoration: const InputDecoration(
-                            labelText: "User ID",
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Colors.white10,
-                            prefixIcon: Icon(Icons.fingerprint),
+                          decoration: _buildInputDecoration(
+                            "User ID",
+                            Icons.fingerprint,
+                            isReadOnly: true,
                           ),
                           style: const TextStyle(color: Colors.grey),
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 16),
 
                         TextFormField(
                           controller: _emailController,
                           readOnly: true,
-                          decoration: const InputDecoration(
-                            labelText: "E-mail",
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Colors.white10,
-                            prefixIcon: Icon(Icons.email),
+                          decoration: _buildInputDecoration(
+                            "E-mail",
+                            Icons.email_outlined,
+                            isReadOnly: true,
                           ),
                           style: const TextStyle(color: Colors.grey),
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 32),
+
+                        const Text(
+                          "Dane osobowe",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
                         TextFormField(
                           controller: _firstNameController,
-                          decoration: const InputDecoration(
-                            labelText: "Imię",
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
+                          decoration: _buildInputDecoration(
+                            "Imię",
+                            Icons.person_outline,
                           ),
                           validator: (value) => value == null || value.isEmpty
                               ? "To pole jest wymagane"
                               : null,
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 16),
 
                         TextFormField(
                           controller: _lastNameController,
-                          decoration: const InputDecoration(
-                            labelText: "Nazwisko",
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person_outline),
+                          decoration: _buildInputDecoration(
+                            "Nazwisko",
+                            Icons.person_outline,
                           ),
                           validator: (value) => value == null || value.isEmpty
                               ? "To pole jest wymagane"
                               : null,
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 16),
 
                         TextFormField(
                           controller: _phoneController,
-                          decoration: const InputDecoration(
-                            labelText: "Telefon",
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.phone),
+                          decoration: _buildInputDecoration(
+                            "Telefon",
+                            Icons.phone_outlined,
                           ),
                           keyboardType: TextInputType.phone,
                           validator: (value) => value == null || value.isEmpty
                               ? "To pole jest wymagane"
                               : null,
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 16),
 
                         DropdownButtonFormField<SexRole>(
                           initialValue: _selectedSex,
-                          decoration: const InputDecoration(
-                            labelText: "Płeć",
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.wc),
+                          decoration: _buildInputDecoration(
+                            "Płeć",
+                            Icons.wc_outlined,
+                          ),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.deepPurple,
                           ),
                           items: SexRole.values.map((sex) {
                             return DropdownMenuItem(
@@ -353,39 +405,44 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                             );
                           }).toList(),
                           onChanged: (val) {
-                            if (val != null) {
-                              setState(() {
-                                _selectedSex = val;
-                              });
-                            }
+                            if (val != null) setState(() => _selectedSex = val);
                           },
                         ),
-
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 40),
 
                         // Przycisk Zapisz
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: 56,
                           child: ElevatedButton(
                             onPressed: isLoading
                                 ? null
                                 : () => _saveProfile(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueGrey,
+                              backgroundColor: Colors.deepPurple,
                               foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                             child: isLoading
                                 ? const CircularProgressIndicator(
                                     color: Colors.white,
                                   )
-                                : const Text("Zapisz zmiany"),
+                                : const Text(
+                                    "Zapisz zmiany",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
 
-                        const SizedBox(height: 50),
-                        const Divider(thickness: 2, color: Colors.redAccent),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 40),
+                        Divider(thickness: 1, color: Colors.grey.shade200),
+                        const SizedBox(height: 20),
 
                         // --- SEKCJA USUWANIA KONTA ---
                         const Text(
@@ -393,31 +450,46 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
+                            fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: 56,
                           child: OutlinedButton.icon(
                             onPressed: isLoading
                                 ? null
                                 : () => _showDeleteConfirmationDialog(context),
-                            icon: const Icon(Icons.delete_forever),
-                            label: const Text("Usuń konto"),
+                            icon: const Icon(Icons.delete_outline),
+                            label: const Text(
+                              "Usuń konto na zawsze",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.red,
-                              side: const BorderSide(color: Colors.red),
+                              side: BorderSide(
+                                color: Colors.red.shade300,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
                 );
               }
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.deepPurple),
+              );
             },
           ),
         );

@@ -10,23 +10,80 @@ class MainWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        // Ważne przy 3+ elementach: type: fixed zapobiega "tańczeniu" ikon
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _calculateSelectedIndex(context),
-        onTap: (int index) => _onItemTapped(index, context),
-        items: const [
-          // Index 0
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Start'),
-          // Index 1 (NOWY)
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Grafik',
+      // Owijamy BottomNavigationBar w Container, żeby dodać mu ładny cień na górze
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 15,
+              offset: const Offset(
+                0,
+                -5,
+              ), // Ujemny offset, żeby cień padał do góry
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          elevation: 0, // Cień robimy w Containerze powyżej
+          backgroundColor: Colors.white,
+          type: BottomNavigationBarType.fixed,
+          // --- STYLIZACJA KOLORÓW I TEKSTU ---
+          selectedItemColor: Colors.deepPurple,
+          unselectedItemColor: Colors.grey.shade400,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
           ),
-          // Index 2
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-        ],
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+
+          currentIndex: _calculateSelectedIndex(context),
+          onTap: (int index) => _onItemTapped(index, context),
+          items: const [
+            // Index 0
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.home_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.home),
+              ), // Wypełniona ikona po kliknięciu
+              label: 'Start',
+            ),
+            // Index 1
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.calendar_month_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.calendar_month),
+              ),
+              label: 'Grafik',
+            ),
+            // Index 2
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.person_outline),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.person),
+              ),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -44,7 +101,9 @@ class MainWrapper extends StatelessWidget {
       return 1;
     }
     // Jeśli jesteśmy w profilu, ustawieniach lub adminie -> podświetl ludzika
-    if (location.startsWith('/user') || location.startsWith('/admin')) {
+    if (location.startsWith('/user') ||
+        location.startsWith('/admin') ||
+        location.startsWith('/trainer')) {
       return 2;
     }
 
