@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MainWrapper extends StatelessWidget {
-  // To "child" to jest właśnie aktualny ekran, który go_router nam wstrzyknie.
   final Widget child;
 
   const MainWrapper({super.key, required this.child});
@@ -12,7 +11,6 @@ class MainWrapper extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: child,
-      // Owijamy BottomNavigationBar w Container, żeby dodać mu ładny cień na górze
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -20,18 +18,14 @@ class MainWrapper extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 15,
-              offset: const Offset(
-                0,
-                -5,
-              ), // Ujemny offset, żeby cień padał do góry
+              offset: const Offset(0, -5),
             ),
           ],
         ),
         child: BottomNavigationBar(
-          elevation: 0, // Cień robimy w Containerze powyżej
+          elevation: 0,
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
-          // --- STYLIZACJA KOLORÓW I TEKSTU ---
           selectedItemColor: Colors.deepPurple,
           unselectedItemColor: Colors.grey.shade400,
           selectedLabelStyle: const TextStyle(
@@ -55,7 +49,7 @@ class MainWrapper extends StatelessWidget {
               activeIcon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
                 child: Icon(Icons.home),
-              ), // Wypełniona ikona po kliknięciu
+              ),
               label: 'Start',
             ),
             // Index 1
@@ -70,7 +64,19 @@ class MainWrapper extends StatelessWidget {
               ),
               label: 'Grafik',
             ),
-            // Index 2
+            // Index 2 (PRZENIESIONY KARNET)
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.qr_code_scanner),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.qr_code),
+              ),
+              label: 'Karnet',
+            ),
+            // Index 3 (PRZENIESIONY PROFIL NA SAM KONIEC)
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -91,23 +97,23 @@ class MainWrapper extends StatelessWidget {
   int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
 
-    // Logika podświetlania ikon w zależności od adresu URL
     if (location.startsWith('/home')) {
       return 0;
     }
-    // Jeśli jesteśmy w grafiku LUB w edycji zajęć -> podświetl kalendarz
     if (location.startsWith('/schedule') ||
         location.startsWith('/add-edit-class')) {
       return 1;
     }
-    // Jeśli jesteśmy w profilu, ustawieniach lub adminie -> podświetl ludzika
+    if (location.startsWith('/pass')) {
+      return 2;
+    }
     if (location.startsWith('/user') ||
         location.startsWith('/admin') ||
         location.startsWith('/trainer')) {
-      return 2;
+      return 3;
     }
 
-    return 0; // Domyślnie Home
+    return 0;
   }
 
   void _onItemTapped(int index, BuildContext context) {
@@ -119,6 +125,9 @@ class MainWrapper extends StatelessWidget {
         context.go('/schedule');
         break;
       case 2:
+        context.go('/pass');
+        break;
+      case 3:
         context.go('/user');
         break;
     }
