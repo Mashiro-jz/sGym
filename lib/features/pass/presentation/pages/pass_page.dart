@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+// TODO: PRZETESTUJ MNIE I PRZECZYTAJ O MNIE
+
 class PassPage extends StatefulWidget {
   const PassPage({super.key});
 
@@ -18,7 +20,7 @@ class _PassPageState extends State<PassPage>
   double _progress = 1.0;
   late String _currentQrData;
   final bool __hasActivePass = true;
-  final int _refreshIntervalSeconds = 30;
+  final int _refreshIntervalSeconds = 30; // Czas co ile tworzymy nowy kod QR
 
   @override
   void initState() {

@@ -11,6 +11,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/main_wrapper.dart';
 import '../../features/user/presentation/pages/user_page.dart';
+import '../../features/pass/presentation/pages/pass_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -39,6 +40,7 @@ final GoRouter appRouter = GoRouter(
           path: '/home',
           builder: (context, state) => const DashboardView(),
         ),
+        GoRoute(path: '/pass', builder: (context, state) => const PassPage()),
         // Zakładka 2: Profil
         GoRoute(
           path: '/user',

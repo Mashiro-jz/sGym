@@ -40,6 +40,7 @@ class MainWrapper extends StatelessWidget {
           currentIndex: _calculateSelectedIndex(context),
           onTap: (int index) => _onItemTapped(index, context),
           items: const [
+            // Index 0
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -51,6 +52,7 @@ class MainWrapper extends StatelessWidget {
               ),
               label: 'Start',
             ),
+            // Index 1
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -62,6 +64,19 @@ class MainWrapper extends StatelessWidget {
               ),
               label: 'Grafik',
             ),
+            // Index 2 (PRZENIESIONY KARNET)
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.qr_code_scanner),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 4),
+                child: Icon(Icons.qr_code),
+              ),
+              label: 'Karnet',
+            ),
+            // Index 3 (PRZENIESIONY PROFIL NA SAM KONIEC)
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -72,17 +87,6 @@ class MainWrapper extends StatelessWidget {
                 child: Icon(Icons.person),
               ),
               label: 'Profil',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: EdgeInsets.only(bottom: 4),
-                child: Icon(Icons.qr_code_scanner),
-              ), // POPRAWIONE
-              activeIcon: Padding(
-                padding: EdgeInsets.only(bottom: 4),
-                child: Icon(Icons.qr_code),
-              ),
-              label: 'Karnet',
             ),
           ],
         ),
@@ -100,12 +104,12 @@ class MainWrapper extends StatelessWidget {
         location.startsWith('/add-edit-class')) {
       return 1;
     }
+    if (location.startsWith('/pass')) {
+      return 2;
+    }
     if (location.startsWith('/user') ||
         location.startsWith('/admin') ||
         location.startsWith('/trainer')) {
-      return 2;
-    }
-    if (location.startsWith('/pass')) {
       return 3;
     }
 
@@ -121,10 +125,10 @@ class MainWrapper extends StatelessWidget {
         context.go('/schedule');
         break;
       case 2:
-        context.go('/user');
+        context.go('/pass');
         break;
       case 3:
-        context.go('/pass');
+        context.go('/user');
         break;
     }
   }
