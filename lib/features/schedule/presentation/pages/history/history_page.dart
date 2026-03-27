@@ -67,10 +67,13 @@ class _HistoryView extends StatelessWidget {
           if (state is ScheduleLoaded) {
             final now = DateTime.now();
 
-            // 1. Filtrujemy tylko zajęcia, które już minęły
-            final pastClasses = state.classes
-                .where((c) => c.startTime.isBefore(now))
-                .toList();
+            // 1. Filtrujemy tylko zajęcia, które ZAKOŃCZYŁY SIĘ w przeszłości
+            final pastClasses = state.classes.where((c) {
+              final endTime = c.startTime.add(
+                Duration(minutes: c.durationMinutes),
+              );
+              return endTime.isBefore(now);
+            }).toList();
 
             // 2. Sortujemy malejąco (najświeższe na górze)
             pastClasses.sort((a, b) => b.startTime.compareTo(a.startTime));

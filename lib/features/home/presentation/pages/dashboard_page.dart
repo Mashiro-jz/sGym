@@ -210,7 +210,7 @@ class _DashboardViewState extends State<DashboardView> {
           ],
         ),
         InkWell(
-          onTap: () => context.push('/user'),
+          onTap: () => context.go('/user'),
           customBorder: const CircleBorder(),
           child: CircleAvatar(
             radius: 28,
@@ -348,13 +348,13 @@ class _DashboardViewState extends State<DashboardView> {
           Icons.calendar_month,
           "Grafik",
           Colors.blue,
-          () => context.push('/schedule'),
+          () => context.go('/schedule'),
         ),
         _buildActionItem(
           Icons.credit_card,
           "Karnet",
           Colors.orange,
-          () => context.push('/pass'),
+          () => context.go('/pass'),
         ),
         _buildActionItem(
           Icons.history,
@@ -366,7 +366,7 @@ class _DashboardViewState extends State<DashboardView> {
           Icons.more_horiz,
           "Więcej",
           Colors.grey.shade700,
-          () => context.push('/user'),
+          () => context.go('/user'),
         ),
       ],
     );
