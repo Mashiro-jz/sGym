@@ -19,7 +19,8 @@ class _PassPageState extends State<PassPage>
   late Timer _timer;
   double _progress = 1.0;
   late String _currentQrData;
-  final bool __hasActivePass = true;
+  final bool __hasActivePass =
+      true; // Ta zmienna aktualnie jest na sztywno do przetestowania, ale jak zostanie dodane kupowanie karnetów to będzie ona się zmieniać zależnie od informacji z bazy danych (Gemini Ci wyjaśni)
   final int _refreshIntervalSeconds = 30; // Czas co ile tworzymy nowy kod QR
 
   @override

@@ -33,120 +33,51 @@ class _DashboardViewState extends State<DashboardView> {
       backgroundColor: Colors.grey.shade50,
       body: SafeArea(
         child: BlocBuilder<AuthCubit, AuthState>(
-          builder: (context, state) {
-            if (state is Authenticated) {
+          builder: (context, authState) {
+            if (authState is Authenticated) {
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 1. Nagłówek powitalny
-                    _buildHeader(state.user.firstName),
+                    _buildHeader(context, authState.user.firstName),
                     const SizedBox(height: 32),
 
-                    // 2. Najbliższy trening (Hero Widget)
-                    _buildSectionTitle("Twój najbliższy trening"),
-                    const SizedBox(height: 16),
+                    // Obejmujemy resztę ekranu w BlocBuilder, by wszystkie karty miały dostęp do danych
                     BlocBuilder<ScheduleCubit, ScheduleState>(
-                      builder: (context, state) {
-                        if (state is ScheduleLoading) {
-                          // Zmieniono na spójną wizualnie kartę ładowania (Shimmer effect style)
-                          return _buildCardPlaceholder(
-                            child: const CircularProgressIndicator(
-                              color: Colors.deepPurple,
-                            ),
-                          );
+                      builder: (context, scheduleState) {
+                        // Pobieramy listę zajęć, jeśli są załadowane (w przeciwnym razie pusta lista)
+                        List<GymClass> userClasses = [];
+                        if (scheduleState is ScheduleLoaded) {
+                          userClasses = scheduleState.classes;
                         }
-                        if (state is ScheduleError) {
-                          // Zmieniono na estetyczną kartę błędu z ikoną
-                          return _buildCardPlaceholder(
-                            color: Colors.red.shade50,
-                            borderColor: Colors.red.shade200,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red.shade400,
-                                  size: 40,
-                                ),
-                                const SizedBox(height: 12),
-                                const Text(
-                                  "Ups! Coś poszło nie tak.",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "Nie udało się załadować treningu.",
-                                  style: TextStyle(
-                                    color: Colors.red.shade700,
-                                    fontSize: 13,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        if (state is ScheduleLoaded && state.classes.isEmpty) {
-                          // Zmieniono na estetyczną kartę zachęcającą do treningu
-                          return _buildCardPlaceholder(
-                            color: Colors.white,
-                            borderColor: Colors.grey.shade300,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.weekend_outlined,
-                                  color: Colors.grey.shade400,
-                                  size: 48,
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  "Wolny dzień!",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Nie masz dziś w planach żadnego wycisku. Odpoczywaj lub zapisz się na zajęcia!",
-                                  style: TextStyle(color: Colors.grey.shade600),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        if (state is ScheduleLoaded) {
-                          GymClass firstGymClass = state.classes.first;
-                          String trainerName =
-                              state.trainerNames[firstGymClass.trainerId] ??
-                              "Nieznany trener";
-                          return _buildNextTrainingCard(
-                            firstGymClass,
-                            trainerName,
-                          );
-                        }
-                        // Fallback fallbacku
-                        return const SizedBox.shrink();
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 2. Najbliższy trening
+                            _buildSectionTitle("Twój najbliższy trening"),
+                            const SizedBox(height: 16),
+                            _buildNextTrainingSection(context, scheduleState),
+
+                            const SizedBox(height: 32),
+
+                            // 3. Szybkie akcje (Podpięty routing!)
+                            _buildSectionTitle("Na skróty"),
+                            const SizedBox(height: 16),
+                            _buildQuickActions(context),
+
+                            const SizedBox(height: 32),
+
+                            // 4. Motywacja / Statystyki (TUTAJ DZIEJE SIĘ MAGIA)
+                            _buildSectionTitle("Twoja aktywność"),
+                            const SizedBox(height: 16),
+                            _buildActivityCard(userClasses),
+                          ],
+                        );
                       },
                     ),
-
-                    const SizedBox(height: 32),
-
-                    // 3. Szybkie akcje
-                    _buildSectionTitle("Na skróty"),
-                    const SizedBox(height: 16),
-                    _buildQuickActions(),
-
-                    const SizedBox(height: 32),
-
-                    // 4. Motywacja / Statystyki
-                    _buildSectionTitle("Twoja aktywność"),
-                    const SizedBox(height: 16),
-                    _buildActivityCard(),
                   ],
                 ),
               );
@@ -160,7 +91,84 @@ class _DashboardViewState extends State<DashboardView> {
 
   // --- WIDŻETY POMOCNICZE ---
 
-  // NOWY WIDŻET: Ujednolicony wygląd pustych kart
+  Widget _buildNextTrainingSection(BuildContext context, ScheduleState state) {
+    if (state is ScheduleLoading) {
+      return _buildCardPlaceholder(
+        child: const CircularProgressIndicator(color: Colors.deepPurple),
+      );
+    }
+
+    if (state is ScheduleError) {
+      return _buildCardPlaceholder(
+        color: Colors.red.shade50,
+        borderColor: Colors.red.shade200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: Colors.red.shade400, size: 40),
+            const SizedBox(height: 12),
+            const Text(
+              "Ups! Coś poszło nie tak.",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Nie udało się załadować treningu.",
+              style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state is ScheduleLoaded) {
+      // Szukamy najbliższych nadchodzących zajęć
+      final now = DateTime.now();
+      final upcomingClasses = state.classes
+          .where((c) => c.startTime.isAfter(now))
+          .toList();
+
+      if (upcomingClasses.isEmpty) {
+        return _buildCardPlaceholder(
+          color: Colors.white,
+          borderColor: Colors.grey.shade300,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.weekend_outlined,
+                color: Colors.grey.shade400,
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Wolny dzień!",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Nie masz dziś w planach żadnego wycisku. Odpoczywaj lub zapisz się na zajęcia!",
+                style: TextStyle(color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Sortujemy, żeby pokazać najbliższe na samej górze
+      upcomingClasses.sort((a, b) => a.startTime.compareTo(b.startTime));
+      final firstGymClass = upcomingClasses.first;
+      final trainerName =
+          state.trainerNames[firstGymClass.trainerId] ?? "Nieznany trener";
+
+      return _buildNextTrainingCard(context, firstGymClass, trainerName);
+    }
+
+    return const SizedBox.shrink();
+  }
+
   Widget _buildCardPlaceholder({
     required Widget child,
     Color? color,
@@ -168,7 +176,7 @@ class _DashboardViewState extends State<DashboardView> {
   }) {
     return Container(
       width: double.infinity,
-      height: 200, // Zbliżona wysokość do fioletowej karty treningu
+      height: 200,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: color ?? Colors.white,
@@ -179,7 +187,7 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildHeader(String firstName) {
+  Widget _buildHeader(BuildContext context, String firstName) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -202,13 +210,11 @@ class _DashboardViewState extends State<DashboardView> {
           ],
         ),
         InkWell(
-          onTap: () {
-            context.go('/user');
-          },
+          onTap: () => context.push('/user'),
           customBorder: const CircleBorder(),
           child: CircleAvatar(
             radius: 28,
-            backgroundColor: Colors.deepPurple.shade100,
+            backgroundColor: Colors.deepPurple.shade50,
             child: const Icon(Icons.person, color: Colors.deepPurple, size: 30),
           ),
         ),
@@ -227,7 +233,11 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildNextTrainingCard(GymClass gymClass, String trainerName) {
+  Widget _buildNextTrainingCard(
+    BuildContext context,
+    GymClass gymClass,
+    String trainerName,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -270,7 +280,7 @@ class _DashboardViewState extends State<DashboardView> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "${gymClass.startTime.hour}:${gymClass.startTime.minute.toString().padLeft(2, '0')}", // CZAS
+                      "${gymClass.startTime.hour}:${gymClass.startTime.minute.toString().padLeft(2, '0')}",
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -284,7 +294,7 @@ class _DashboardViewState extends State<DashboardView> {
           ),
           const SizedBox(height: 20),
           Text(
-            gymClass.name, // NAZWA
+            gymClass.name,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -293,7 +303,7 @@ class _DashboardViewState extends State<DashboardView> {
           ),
           const SizedBox(height: 8),
           Text(
-            trainerName, // IMIE TRENERA
+            trainerName,
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 20),
@@ -330,52 +340,128 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildActionItem(Icons.calendar_month, "Grafik", Colors.blue),
-        _buildActionItem(Icons.credit_card, "Karnet", Colors.orange),
-        _buildActionItem(Icons.history, "Historia", Colors.green),
-        _buildActionItem(Icons.more_horiz, "Więcej", Colors.grey.shade700),
-      ],
-    );
-  }
-
-  Widget _buildActionItem(IconData icon, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-          ),
-          child: Icon(icon, color: color, size: 28),
+        _buildActionItem(
+          Icons.calendar_month,
+          "Grafik",
+          Colors.blue,
+          () => context.push('/schedule'),
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade800,
-          ),
+        _buildActionItem(
+          Icons.credit_card,
+          "Karnet",
+          Colors.orange,
+          () => context.push('/pass'),
+        ),
+        _buildActionItem(
+          Icons.history,
+          "Historia",
+          Colors.green,
+          () => context.push('/history'),
+        ), // Tu kieruje do historii
+        _buildActionItem(
+          Icons.more_horiz,
+          "Więcej",
+          Colors.grey.shade700,
+          () => context.push('/user'),
         ),
       ],
     );
   }
 
-  Widget _buildActivityCard() {
-    // TODO: Wypełnić te dane w przyszłości
+  Widget _buildActionItem(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- DYNAMICZNA KARTA AKTYWNOŚCI ---
+  Widget _buildActivityCard(List<GymClass> classes) {
+    // 1. Znajdujemy granice obecnego tygodnia (Poniedziałek - Niedziela)
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final monday = DateTime(
+      startOfWeek.year,
+      startOfWeek.month,
+      startOfWeek.day,
+    );
+    final sunday = monday.add(const Duration(days: 6, hours: 23, minutes: 59));
+
+    // 2. Filtrujemy zajęcia, które odbywają/odbyły się w tym tygodniu
+    final weeklyClasses = classes
+        .where(
+          (c) => c.startTime.isAfter(monday) && c.startTime.isBefore(sunday),
+        )
+        .toList();
+
+    final int currentScore =
+        weeklyClasses.length; // TODO: targetGoal zmienić z czasem
+    const int targetGoal = 4; // Nasz domyślny cel (np. 4 treningi w tygodniu)
+
+    // 3. Zabezpieczenie przed ułamkami większymi niż 1.0
+    double progress = currentScore / targetGoal;
+    if (progress > 1.0) progress = 1.0;
+
+    // 4. Dynamiczna zmiana tekstów na podstawie wyniku
+    String title = "Czas zacząć!";
+    String subtitle = "Zapisz się na pierwszy trening w tym tygodniu.";
+    Color progressColor = Colors.orange;
+
+    if (currentScore >= targetGoal) {
+      title = "Niesamowite!";
+      subtitle = "Zrealizowałeś 100% swojego celu na ten tydzień!";
+      progressColor = Colors.green;
+    } else if (currentScore > 0) {
+      title = "Dobry start!";
+      subtitle =
+          "Zrealizowałeś ${(progress * 100).toInt()}% swojego celu treningowego.";
+      progressColor = Colors.blue;
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -386,16 +472,19 @@ class _DashboardViewState extends State<DashboardView> {
                 height: 60,
                 width: 60,
                 child: CircularProgressIndicator(
-                  value: 0.75, // Przykładowe 75%
+                  value: progress,
                   strokeWidth: 8,
                   backgroundColor: Colors.grey.shade100,
-                  color: Colors.green,
+                  color: progressColor,
                   strokeCap: StrokeCap.round,
                 ),
               ),
-              const Text(
-                "3/4",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Text(
+                "$currentScore/$targetGoal",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -404,14 +493,21 @@ class _DashboardViewState extends State<DashboardView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Świetna robota!",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Zrealizowałeś 75% swojego celu treningowego w tym tygodniu.",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  subtitle,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 13,
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),

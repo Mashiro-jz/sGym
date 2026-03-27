@@ -2,7 +2,7 @@ import 'package:agym/core/enums/user_role.dart';
 import 'package:agym/core/utils/sex_role_extensions.dart';
 import 'package:agym/core/utils/user_role_extensions.dart';
 import 'package:agym/core/widget/login_out_btn.dart';
-import 'package:agym/core/widget/modern_user_avatar.dart'; // Używamy naszego awatara
+import 'package:agym/core/widget/modern_user_avatar.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
@@ -51,7 +51,6 @@ class UserProfile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               child: Column(
                 children: [
-                  // Używamy nowego, ślicznego Awatara
                   ModernUserAvatar(
                     firstName: user.firstName,
                     lastName: user.lastName,
@@ -72,7 +71,6 @@ class UserProfile extends StatelessWidget {
 
                   const SizedBox(height: 6),
 
-                  // Ładniejsza pigułka roli
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -94,28 +92,35 @@ class UserProfile extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Przyciski akcji
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Przyciski akcji (DODANO HISTORIĘ)
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 12,
                     children: [
-                      if (user.userRole == UserRole.manager) ...[
+                      if (user.userRole == UserRole.manager)
                         _buildActionButton(
                           context: context,
                           icon: Icons.admin_panel_settings_outlined,
                           label: "Panel",
                           onTap: () => context.push('/admin'),
                         ),
-                        const SizedBox(width: 12),
-                      ],
-                      if (user.userRole == UserRole.trainer) ...[
+                      if (user.userRole == UserRole.trainer)
                         _buildActionButton(
                           context: context,
                           icon: Icons.person_outline,
                           label: "Trener",
                           onTap: () => context.push('/trainer'),
                         ),
-                        const SizedBox(width: 12),
-                      ],
+                      //TODO: PODPIĄC NOWY EKRAN
+                      _buildActionButton(
+                        context: context,
+                        icon: Icons.history, // Ikona historii
+                        label: "Historia",
+                        onTap: () => context.push(
+                          '/history',
+                        ), // Tu podepniesz nowy ekran!
+                      ),
                       _buildActionButton(
                         context: context,
                         icon: Icons.settings_outlined,
@@ -127,7 +132,6 @@ class UserProfile extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Szczegóły w jednej czystej karcie
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
@@ -155,7 +159,6 @@ class UserProfile extends StatelessWidget {
               ),
             ),
 
-            // Nowoczesny separator sekcji (Zamiast chudej kreski)
             Container(
               height: 12,
               width: double.infinity,
@@ -221,15 +224,28 @@ class UserProfile extends StatelessWidget {
                       ),
                     );
                   } else if (state is ScheduleLoaded) {
-                    if (state.classes.isEmpty) {
+                    // DODANO: Filtrowanie tylko nadchodzących zajęć + sortowanie
+                    final now = DateTime.now();
+                    final upcomingClasses = state.classes
+                        .where((c) => c.startTime.isAfter(now))
+                        .toList();
+
+                    upcomingClasses.sort(
+                      (a, b) => a.startTime.compareTo(b.startTime),
+                    );
+
+                    if (upcomingClasses.isEmpty) {
                       return _buildEmptyState();
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: state.classes.length,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: upcomingClasses.length,
                       itemBuilder: (context, index) {
-                        final gymClass = state.classes[index];
+                        final gymClass = upcomingClasses[index];
                         final trainerName =
                             state.trainerNames[gymClass.trainerId] ??
                             "Nieznany trener";
@@ -241,18 +257,18 @@ class UserProfile extends StatelessWidget {
                           'HH:mm',
                         ).format(gymClass.startTime);
 
-                        // Nowoczesna Karta Treningu
+                        // ZAKTUALIZOWANY WYGLĄD: jak na flutter_06.png
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade100),
+                            border: Border.all(color: Colors.grey.shade200),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -273,32 +289,34 @@ class UserProfile extends StatelessWidget {
                               padding: const EdgeInsets.all(12.0),
                               child: Row(
                                 children: [
-                                  // Fioletowa pigułka z godziną
+                                  // Jasnofioletowa, kwadratowa pigułka po lewej
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
+                                      horizontal: 16,
+                                      vertical: 14,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.deepPurple.shade50,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           timeStr,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 15,
+                                            fontSize: 16,
                                             color: Colors.deepPurple,
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 4),
                                         Text(
                                           "${gymClass.durationMinutes} min",
                                           style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.deepPurple.shade400,
+                                            fontSize: 11,
+                                            color: Colors.deepPurple.shade300,
                                           ),
                                         ),
                                       ],
@@ -315,10 +333,11 @@ class UserProfile extends StatelessWidget {
                                           gymClass.name,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 15,
+                                            fontSize: 16,
+                                            color: Colors.black87,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 6),
                                         Text(
                                           dateStr,
                                           style: TextStyle(
@@ -330,21 +349,44 @@ class UserProfile extends StatelessWidget {
                                     ),
                                   ),
 
+                                  // Czerwona ikona usunięcia po prawej
                                   IconButton(
                                     onPressed: () {
-                                      // ... Twój istniejący kod Dialogu Wypisywania ...
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: const Text("Wypisać się?"),
+                                          content: Text(
+                                            "Czy chcesz zrezygnować z zajęć ${gymClass.name}?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(ctx),
+                                              child: const Text("Nie"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(ctx);
+                                                context
+                                                    .read<ScheduleCubit>()
+                                                    .signOutFromClassActivity(
+                                                      gymClass,
+                                                    );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.red,
+                                              ),
+                                              child: const Text("Tak, wypisz"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
                                     },
-                                    icon: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.remove,
-                                        color: Colors.red.shade400,
-                                        size: 16,
-                                      ),
+                                    icon: Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.red.shade400,
+                                      size: 28,
                                     ),
                                     tooltip: "Wypisz się",
                                   ),
@@ -368,7 +410,6 @@ class UserProfile extends StatelessWidget {
 
   // --- Pomocnicze Widgety ---
 
-  // Nowy wygląd przycisków akcji (np. Ustawienia)
   Widget _buildActionButton({
     required BuildContext context,
     required IconData icon,
@@ -385,6 +426,7 @@ class UserProfile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 16, color: Colors.black87),
             const SizedBox(width: 6),

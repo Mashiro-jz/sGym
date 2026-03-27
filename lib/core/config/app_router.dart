@@ -1,6 +1,7 @@
 import 'package:agym/features/admin/presentation/pages/admin_page.dart';
 import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:agym/features/schedule/presentation/pages/history/history_page.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule/add_edit_class_page.dart';
 import 'package:agym/features/schedule/presentation/pages/schedule/schedule_page.dart';
 import 'package:agym/features/schedule/presentation/pages/trainer/trainer_page.dart';
@@ -59,6 +60,10 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/schedule',
           builder: (context, state) => const SchedulePage(),
+        ),
+        GoRoute(
+          path: '/history',
+          builder: (context, state) => const HistoryPage(),
         ),
         GoRoute(
           path: '/add-edit-class',
