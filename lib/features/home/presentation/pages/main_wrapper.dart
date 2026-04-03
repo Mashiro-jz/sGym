@@ -6,37 +6,45 @@ class MainWrapper extends StatelessWidget {
 
   const MainWrapper({super.key, required this.child});
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          _bgColor, // Ciemne tło zapobiegające błyskom przy ładowaniu
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 15,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          color: _surfaceColor, // Ciemnozielone tło paska
+          border: Border(
+            top: BorderSide(
+              color: _borderColor,
+              width: 1.0,
+            ), // Elegancka, cienka ramka zamiast cienia
+          ),
         ),
         child: BottomNavigationBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor:
+              Colors.transparent, // Przezroczyste, by użyć koloru z Container
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.grey.shade400,
+          selectedItemColor:
+              _primaryColor, // Neonowa zieleń dla wybranej zakładki
+          unselectedItemColor: _textHintColor, // Szaro-zielony dla pozostałych
           selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900, // Grubszy font dla wybranej opcji
             fontSize: 12,
           ),
           unselectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 12,
           ),
-
           currentIndex: _calculateSelectedIndex(context),
           onTap: (int index) => _onItemTapped(index, context),
           items: const [
@@ -64,7 +72,7 @@ class MainWrapper extends StatelessWidget {
               ),
               label: 'Grafik',
             ),
-            // Index 2 (PRZENIESIONY KARNET)
+            // Index 2 (Karnet)
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -76,7 +84,7 @@ class MainWrapper extends StatelessWidget {
               ),
               label: 'Karnet',
             ),
-            // Index 3 (PRZENIESIONY PROFIL NA SAM KONIEC)
+            // Index 3 (Profil)
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 4),
@@ -109,7 +117,9 @@ class MainWrapper extends StatelessWidget {
     }
     if (location.startsWith('/user') ||
         location.startsWith('/admin') ||
-        location.startsWith('/trainer')) {
+        location.startsWith('/trainer') ||
+        location.startsWith('/history')) {
+      // Dodano history, by nie gubiło zaznaczenia
       return 3;
     }
 

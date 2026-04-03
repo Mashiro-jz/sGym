@@ -128,10 +128,12 @@ class _LoginPageState extends State<LoginPage> {
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value == null || value.isEmpty)
+                        if (value == null || value.isEmpty) {
                           return 'Podaj e-mail';
-                        if (!value.contains('@'))
+                        }
+                        if (!value.contains('@')) {
                           return 'Błędny format e-maila';
+                        }
                         return null;
                       },
                     ),
@@ -143,8 +145,9 @@ class _LoginPageState extends State<LoginPage> {
                       prefixIcon: Icons.lock_outline,
                       isPassword: true,
                       validator: (value) {
-                        if (value == null || value.length < 6)
+                        if (value == null || value.length < 6) {
                           return 'Hasło musi mieć min. 6 znaków';
+                        }
                         return null;
                       },
                     ),
@@ -330,38 +333,4 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // --- WIDŻET POMOCNICZY: PRZYCISK SOCIAL MEDIA ---
-  Widget _buildSocialButton({
-    required IconData icon,
-    required String label,
-    required Color iconColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        height: 56,
-        decoration: BoxDecoration(
-          color: Colors.transparent, // Tło przezroczyste na mockupie
-          borderRadius: BorderRadius.circular(30), // Mocne zaokrąglenie
-          border: Border.all(color: _borderColor, width: 1.5),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: 28),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
