@@ -9,6 +9,7 @@ class ModernUserButton extends StatelessWidget {
   final bool isRegistered;
   final bool isFull;
   final bool hasStarted;
+
   const ModernUserButton(
     this.context,
     this.gymClass,
@@ -18,12 +19,20 @@ class ModernUserButton extends StatelessWidget {
     super.key,
   });
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   @override
   Widget build(BuildContext context) {
     if (hasStarted) {
       return Text(
         "Zakończone",
-        style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+        style: TextStyle(
+          color: _textHintColor,
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+        ),
       );
     }
 
@@ -32,29 +41,47 @@ class ModernUserButton extends StatelessWidget {
         onPressed: () =>
             context.read<ScheduleCubit>().signOutFromClassActivity(gymClass),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red,
-          side: const BorderSide(color: Colors.red),
+          foregroundColor: Colors.redAccent,
+          side: const BorderSide(color: Colors.redAccent, width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: const Text("Wypisz się"),
+        child: const Text(
+          "Wypisz się",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       );
     }
 
     if (isFull) {
       return const Text(
         "Brak miejsc",
-        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: Colors.redAccent,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
       );
     }
 
-    return FilledButton(
+    return ElevatedButton(
       onPressed: () =>
           context.read<ScheduleCubit>().signUpForClassActivity(gymClass),
-      style: FilledButton.styleFrom(
-        backgroundColor: Colors.deepPurple,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _primaryColor,
+        foregroundColor: Colors.black, // Mocny kontrast dla neonu
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
-      child: const Text("Zapisz się"),
+      child: const Text(
+        "Zapisz się",
+        style: TextStyle(fontWeight: FontWeight.w900),
+      ),
     );
   }
 }

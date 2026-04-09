@@ -5,7 +5,6 @@ import 'package:agym/features/auth/domain/entities/user.dart';
 import 'package:agym/features/schedule/domain/entities/gym_class.dart';
 import 'package:agym/features/schedule/presentation/cubit/class_participants_cubit.dart';
 import 'package:agym/features/schedule/presentation/cubit/class_participants_state.dart';
-// Importujemy nasze nowe uniwersalne widżety!
 import 'package:agym/core/widget/modern_user_avatar.dart';
 import 'package:agym/core/widget/modern_info_row.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,13 @@ class TrainerClassDetailsPage extends StatefulWidget {
 }
 
 class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   @override
   Widget build(BuildContext context) {
     final date = widget.gymClass.startTime;
@@ -33,19 +39,20 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
           sl<ClassParticipantsCubit>()
             ..loadParticipants(widget.gymClass.registeredUserIds),
       child: Scaffold(
-        backgroundColor: Colors.grey.shade50, // Jasne tło aplikacji
+        backgroundColor: _bgColor,
         appBar: AppBar(
           title: const Text(
             "Szczegóły Zajęć",
             style: TextStyle(
-              color: Colors.black87,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.transparent,
-          iconTheme: const IconThemeData(color: Colors.black87),
+          backgroundColor: _bgColor,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,16 +62,9 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: _surfaceColor,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.shade100),
+                border: Border.all(color: _borderColor),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,47 +78,44 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.shade50,
+                          color: _primaryColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _primaryColor.withValues(alpha: 0.3),
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.fitness_center,
-                          color: Colors.deepPurple,
-                        ),
+                        child: Icon(Icons.fitness_center, color: _primaryColor),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.calendar_today,
+                      Icon(
+                        Icons.calendar_today_outlined,
                         size: 16,
-                        color: Colors.grey,
+                        color: _textHintColor,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         dateText,
-                        style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                        style: TextStyle(color: _textHintColor, fontSize: 14),
                       ),
                       const SizedBox(width: 20),
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
+                      Icon(Icons.access_time, size: 16, color: _textHintColor),
                       const SizedBox(width: 6),
                       Text(
                         timeText,
-                        style: TextStyle(
-                          color: Colors.grey[800],
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -129,8 +126,8 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                   Text(
                     widget.gymClass.description,
                     style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.grey[600],
+                      fontSize: 14,
+                      color: Colors.grey.shade400,
                       height: 1.5,
                     ),
                   ),
@@ -146,7 +143,11 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                 children: [
                   const Text(
                     "Uczestnicy",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -154,14 +155,16 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade50,
+                      color: _primaryColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green.shade200),
+                      border: Border.all(
+                        color: _primaryColor.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       "${widget.gymClass.registeredUserIds.length} osób",
                       style: TextStyle(
-                        color: Colors.green.shade700,
+                        color: _primaryColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -195,52 +198,49 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
 
                             return Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: _surfaceColor,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.grey.shade100),
+                                border: Border.all(color: _borderColor),
                               ),
                               child: ListTile(
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 8,
                                 ),
-                                // 1. Zastąpiono nowym widżetem Awatara
                                 leading: ModernUserAvatar(
                                   firstName: user.firstName,
                                   lastName: user.lastName,
                                   photoUrl: user.photoUrl,
                                 ),
-                                // 2. IMIĘ I NAZWISKO
                                 title: Text(
                                   fullName,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
+                                    color: Colors.white,
                                   ),
                                 ),
-                                // 3. TELEFON
                                 subtitle: Row(
                                   children: [
                                     Icon(
-                                      Icons.phone,
+                                      Icons.phone_outlined,
                                       size: 14,
-                                      color: Colors.grey[500],
+                                      color: _textHintColor,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       user.phoneNumber,
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.grey[500],
+                                        color: _textHintColor,
                                       ),
                                     ),
                                   ],
                                 ),
-                                // 4. IKONA INFO
                                 trailing: IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.info_outline,
-                                    color: Colors.deepPurple,
+                                    color: _primaryColor,
                                   ),
                                   onPressed: () =>
                                       _showUserDetails(context, user),
@@ -252,11 +252,8 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                         );
                       }
 
-                      // Loader pasujący do reszty apki
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.deepPurple,
-                        ),
+                      return Center(
+                        child: CircularProgressIndicator(color: _primaryColor),
                       );
                     },
                   ),
@@ -272,25 +269,23 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.person_off_outlined,
-            size: 60,
-            color: Colors.deepPurple.withValues(alpha: 0.2),
-          ),
+          Icon(Icons.person_off_outlined, size: 60, color: _textHintColor),
           const SizedBox(height: 16),
           Text(
             "Brak zapisanych uczestników",
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
           ),
         ],
       ),
     );
   }
 
+  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (BOTTOM SHEET) ---
+  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (BOTTOM SHEET) ---
   void _showUserDetails(BuildContext context, User user) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: _bgColor, // Ciemne tło
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -301,13 +296,13 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Mały, szary uchwyt na górze bottom sheet'a (popularny UX)
+                // Szary uchwyt
                 Container(
                   width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: _borderColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -330,15 +325,13 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white, // Gwarancja czytelności
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           user.userRole.displayName,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: _textHintColor, fontSize: 14),
                         ),
                       ],
                     ),
@@ -346,7 +339,7 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Szczegółowe dane (używają nowego uniwersalnego widżetu)
+                // Szczegółowe dane
                 ModernInfoRow(
                   icon: Icons.email_outlined,
                   label: "E-mail",
@@ -367,26 +360,30 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
 
                 const SizedBox(height: 32),
 
-                // Przycisk zamknięcia
+                // Zmieniony, bardziej czytelny przycisk zamknięcia (Outline)
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.deepPurple, // Główny fioletowy kolor
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent, // Przezroczyste tło
+                      foregroundColor: _primaryColor, // Neonowy zielony napis
+                      side: BorderSide(
+                        color: _primaryColor,
+                        width: 2,
+                      ), // Neonowa zielona ramka
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(26),
                       ),
                     ),
                     child: const Text(
                       "Zamknij",
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
                       ),
                     ),
                   ),

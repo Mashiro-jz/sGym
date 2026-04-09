@@ -17,18 +17,25 @@ class ScheduleDetailsPage extends StatelessWidget {
     required this.name,
   });
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   @override
   Widget build(BuildContext context) {
     // Sprawdzamy czy zajęcia już się rozpoczęły (lub odbyły w przeszłości)
     final hasStarted = DateTime.now().isAfter(gymClass.startTime);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: _bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: _bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -39,7 +46,11 @@ class ScheduleDetailsPage extends StatelessWidget {
         ),
         title: const Text(
           "Szczegóły",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
@@ -52,14 +63,22 @@ class ScheduleDetailsPage extends StatelessWidget {
             const SizedBox(height: 32),
             const Text(
               "Prowadzący",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 16),
             _buildTrainerInfo(),
             const SizedBox(height: 32),
             const Text(
               "O zajęciach",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 16),
             _buildClassDescription(),
@@ -67,11 +86,12 @@ class ScheduleDetailsPage extends StatelessWidget {
           ],
         ),
       ),
+      // Dolny panel z przyciskiem do zapisów
       bottomSheet: hasStarted
           ? null
           : Container(
-              color: Colors.grey.shade50,
-              padding: const EdgeInsets.all(24.0),
+              color: _bgColor,
+              padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 32.0),
               child: SafeArea(
                 child: SizedBox(
                   width: double.infinity,
@@ -92,7 +112,7 @@ class ScheduleDetailsPage extends StatelessWidget {
                                 (c) => c.id == gymClass.id,
                               );
                             } catch (e) {
-                              // Ignorujemy, jeśli zajęć z jakiegoś powodu nie ma w nowej puli
+                              // Ignorujemy
                             }
                           }
 
@@ -104,20 +124,17 @@ class ScheduleDetailsPage extends StatelessWidget {
                             onPressed: isLoading
                                 ? null
                                 : () async {
-                                    // 1. Czyścimy stare powiadomienia
                                     ScaffoldMessenger.of(
                                       context,
                                     ).hideCurrentSnackBar();
 
                                     try {
                                       if (isEnrolled) {
-                                        // 2. Czekamy na zakończenie akcji w Cubicie
                                         await context
                                             .read<ScheduleCubit>()
                                             .signOutFromClassActivity(
                                               currentClass,
                                             );
-                                        // 3. Pokazujemy SnackBar bezpośrednio z przycisku (po wykonaniu akcji)
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(
                                             context,
@@ -160,13 +177,22 @@ class ScheduleDetailsPage extends StatelessWidget {
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isEnrolled
-                                  ? Colors.red.shade400
-                                  : Colors.deepPurple,
-                              foregroundColor: Colors.white,
+                                  ? Colors.transparent
+                                  : _primaryColor,
+                              foregroundColor: isEnrolled
+                                  ? Colors.redAccent
+                                  : Colors.black,
+                              side: isEnrolled
+                                  ? const BorderSide(
+                                      color: Colors.redAccent,
+                                      width: 1.5,
+                                    )
+                                  : null,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(30),
                               ),
-                              elevation: isLoading ? 0 : 5,
+                              elevation: isEnrolled || isLoading ? 0 : 8,
+                              shadowColor: _primaryColor.withValues(alpha: 0.4),
                             ),
                             child: isLoading
                                 ? const SizedBox(
@@ -183,7 +209,7 @@ class ScheduleDetailsPage extends StatelessWidget {
                                         : "Zapisz się na zajęcia",
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w900,
                                     ),
                                   ),
                           );
@@ -209,15 +235,12 @@ class ScheduleDetailsPage extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurple.shade400, Colors.deepPurple.shade800],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: _surfaceColor,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -229,15 +252,17 @@ class ScheduleDetailsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
+              color: _primaryColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _primaryColor.withValues(alpha: 0.3)),
             ),
             child: Text(
-              gymClass.category,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+              gymClass.category.toUpperCase(),
+              style: TextStyle(
+                color: _primaryColor,
+                fontWeight: FontWeight.w900,
+                fontSize: 11,
+                letterSpacing: 1.0,
               ),
             ),
           ),
@@ -247,20 +272,21 @@ class ScheduleDetailsPage extends StatelessWidget {
             style: const TextStyle(
               color: Colors.white,
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
               height: 1.2,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 24),
           Row(
             children: [
-              _buildHeroIcon(Icons.calendar_today, dateString),
+              _buildHeroIcon(Icons.calendar_today_outlined, dateString),
               const SizedBox(width: 20),
               _buildHeroIcon(Icons.access_time, timeString),
               const SizedBox(width: 20),
               _buildHeroIcon(
                 Icons.timer_outlined,
-                gymClass.durationMinutes.toString(),
+                "${gymClass.durationMinutes} min",
               ),
             ],
           ),
@@ -272,7 +298,7 @@ class ScheduleDetailsPage extends StatelessWidget {
   Widget _buildHeroIcon(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white70, size: 18),
+        Icon(icon, color: _primaryColor, size: 18),
         const SizedBox(width: 6),
         Text(
           text,
@@ -289,16 +315,16 @@ class ScheduleDetailsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: _borderColor),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: Colors.deepPurple.shade50,
-            child: const Icon(Icons.person, color: Colors.deepPurple, size: 30),
+            backgroundColor: _bgColor,
+            child: Icon(Icons.person, color: _primaryColor, size: 30),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -310,17 +336,18 @@ class ScheduleDetailsPage extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "Trener Personalny",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  style: TextStyle(color: _textHintColor, fontSize: 13),
                 ),
               ],
             ),
           ),
-          Icon(Icons.arrow_forward_ios, color: Colors.grey.shade400, size: 16),
+          Icon(Icons.arrow_forward_ios, color: _textHintColor, size: 16),
         ],
       ),
     );
@@ -330,19 +357,19 @@ class ScheduleDetailsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: _borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             gymClass.description,
-            style: TextStyle(color: Colors.grey.shade700, height: 1.5),
+            style: TextStyle(color: Colors.grey.shade300, height: 1.5),
           ),
           const SizedBox(height: 20),
-          const Divider(),
+          Divider(color: _borderColor),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -361,20 +388,21 @@ class ScheduleDetailsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-        ),
+        Text(label, style: TextStyle(color: _textHintColor, fontSize: 12)),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
         ),
       ],
     );
   }
 
-  // --- NOWY, NOWOCZESNY SNACKBAR ---
+  // --- NOWY, NOWOCZESNY SNACKBAR (DARK THEME) ---
   SnackBar _buildModernSnackBar(String message, {required bool isSuccess}) {
     return SnackBar(
       content: Row(
@@ -397,7 +425,7 @@ class ScheduleDetailsPage extends StatelessWidget {
           ),
         ],
       ),
-      backgroundColor: isSuccess ? Colors.green.shade600 : Colors.red.shade500,
+      backgroundColor: isSuccess ? Colors.green.shade600 : Colors.redAccent,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.only(bottom: 90, left: 24, right: 24),

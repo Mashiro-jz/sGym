@@ -18,17 +18,24 @@ class ModernUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String initials = "${firstName[0]}${lastName[0]}".toUpperCase();
+    // Bezpieczne pobieranie inicjałów (zapobiega błędom, gdy string jest pusty)
+    final String firstInitial = firstName.isNotEmpty ? firstName[0] : "";
+    final String lastInitial = lastName.isNotEmpty ? lastName[0] : "";
+    final String initials = "$firstInitial$lastInitial".toUpperCase();
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Colors.deepPurple.shade50,
-      foregroundColor: Colors.deepPurple.shade700,
+      backgroundColor: Colors.white, // Czysta biel z mockupu
+      foregroundColor: Colors.deepPurple, // Fioletowe litery z mockupu
       backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
       child: photoUrl == null
           ? Text(
-              initials,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),
+              initials.isNotEmpty ? initials : "?",
+              style: TextStyle(
+                fontWeight: FontWeight.w900, // Mocne pogrubienie
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
             )
           : null,
     );

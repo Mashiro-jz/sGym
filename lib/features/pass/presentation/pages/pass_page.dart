@@ -20,13 +20,20 @@ class _PassPageState extends State<PassPage>
   double _progress = 1.0;
   late String _currentQrData;
   final bool __hasActivePass =
-      true; // Ta zmienna aktualnie jest na sztywno do przetestowania, ale jak zostanie dodane kupowanie karnetów to będzie ona się zmieniać zależnie od informacji z bazy danych (Gemini Ci wyjaśni)
+      true; // Ta zmienna aktualnie jest na sztywno do przetestowania
   final int _refreshIntervalSeconds = 30; // Czas co ile tworzymy nowy kod QR
+
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
 
   @override
   void initState() {
     super.initState();
-    _generateQrData(); // Pierwsze wygenerowanie przy starcie
+    _generateQrData();
     _startTimer();
   }
 
@@ -34,13 +41,11 @@ class _PassPageState extends State<PassPage>
     final authState = context.read<AuthCubit>().state;
     if (authState is Authenticated) {
       final userId = authState.user.id;
-      // Dzielimy aktualny czas przez 30 sekund. To "okienko", które zmienia się co pół minuty.
       final timeWindow =
           DateTime.now().millisecondsSinceEpoch ~/
           (_refreshIntervalSeconds * 1000);
 
       setState(() {
-        // Nasz oszukany, ale skuteczny na MVP dynamiczny payload
         _currentQrData = "$userId:$timeWindow";
       });
     }
@@ -49,17 +54,14 @@ class _PassPageState extends State<PassPage>
   void _startTimer() {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       final now = DateTime.now();
-      // Obliczamy ile milisekund minęło w obecnym 30-sekundowym okienku
       final currentMillisInWindow =
           now.millisecondsSinceEpoch % (_refreshIntervalSeconds * 1000);
 
       setState(() {
-        // Pasek postępu od 1.0 w dół do 0.0
         _progress =
             1.0 - (currentMillisInWindow / (_refreshIntervalSeconds * 1000));
       });
 
-      // Jeśli okienko się zresetowało (pasek doszedł do zera), generujemy nowy QR
       if (_progress >= 0.99) {
         _generateQrData();
       }
@@ -77,25 +79,34 @@ class _PassPageState extends State<PassPage>
     final authState = context.watch<AuthCubit>().state;
 
     if (authState is! Authenticated) {
-      return const Scaffold(
-        body: Center(child: Text("Zaloguj się, aby zobaczyć karnet")),
+      return Scaffold(
+        backgroundColor: _bgColor,
+        body: Center(
+          child: Text(
+            "Zaloguj się, aby zobaczyć karnet",
+            style: TextStyle(color: _textHintColor),
+          ),
+        ),
       );
     }
 
     final user = authState.user;
-    // TODO: Tutaj w przyszłości sprawdzisz, czy user._hasActivePass == true
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: _bgColor,
       appBar: AppBar(
         title: const Text(
           "Twój Karnet",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: _bgColor,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -103,30 +114,31 @@ class _PassPageState extends State<PassPage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Wirtualna karta lojalnościowa / Karnet
+              // Wirtualna karta lojalnościowa / VIP Pass
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.deepPurple.shade700,
-                      Colors.deepPurple.shade400,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: _surfaceColor, // Ciemnozielone tło karty
                   borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: _borderColor, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.deepPurple.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                    // Subtelny neonowy blask z tyłu
+                    BoxShadow(
+                      color: _primaryColor.withValues(alpha: 0.05),
+                      blurRadius: 40,
+                      spreadRadius: -10,
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
+                    // Nagłówek Karty
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -134,26 +146,33 @@ class _PassPageState extends State<PassPage>
                           "sGym Pass",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.5,
                           ),
                         ),
                         Icon(
                           Icons.contactless_outlined,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: _primaryColor, // Neonowa ikona NFC
                           size: 32,
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
 
-                    // Białe tło pod kod QR
+                    // Białe tło pod kod QR (WYMAGANE DLA SKANERÓW)
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
+                        // Delikatny wewnętrzny cień dla kontrastu
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -162,9 +181,10 @@ class _PassPageState extends State<PassPage>
                               data: _currentQrData,
                               version: QrVersions.auto,
                               size: 200.0,
-                              // USUNIĘTE: backgroundColor: Colors.white - jest dziedziczone z Containera
+                              // Kod generowany jest na czarno, na białym tle - idealnie!
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
+
                             // Pasek postępu odświeżania
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
@@ -173,16 +193,17 @@ class _PassPageState extends State<PassPage>
                                 minHeight: 6,
                                 backgroundColor: Colors.grey.shade200,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.deepPurple.shade300,
+                                  _primaryColor, // Neonowy pasek odświeżania!
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Text(
                               "Kod odświeża się automatycznie",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade500,
                               ),
                             ),
                           ] else ...[
@@ -196,13 +217,15 @@ class _PassPageState extends State<PassPage>
                                   Icon(
                                     Icons.block,
                                     size: 64,
-                                    color: Colors.red.shade300,
+                                    color: Colors.redAccent,
                                   ),
                                   const SizedBox(height: 16),
                                   const Text(
                                     "Brak aktywnego karnetu",
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
                                     ),
                                   ),
                                 ],
@@ -214,22 +237,25 @@ class _PassPageState extends State<PassPage>
                     ),
 
                     const SizedBox(height: 32),
+
+                    // Informacje o użytkowniku
                     Row(
                       children: [
                         CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          radius: 22,
+                          backgroundColor: _bgColor,
                           child: Text(
                             user.firstName.isNotEmpty
                                 ? user.firstName[0].toUpperCase()
                                 : "?",
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: _primaryColor, // Neonowa litera
                               fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -241,12 +267,27 @@ class _PassPageState extends State<PassPage>
                                 fontSize: 16,
                               ),
                             ),
-                            Text(
-                              "Status: ${__hasActivePass ? 'Aktywny' : 'Nieaktywny'}",
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                fontSize: 12,
-                              ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Text(
+                                  "Status: ",
+                                  style: TextStyle(
+                                    color: _textHintColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  __hasActivePass ? 'Aktywny' : 'Nieaktywny',
+                                  style: TextStyle(
+                                    color: __hasActivePass
+                                        ? _primaryColor
+                                        : Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -258,19 +299,15 @@ class _PassPageState extends State<PassPage>
 
               const SizedBox(height: 40),
 
-              // Ostrzeżenie (dobry UX)
+              // Ostrzeżenie
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 16,
-                    color: Colors.grey.shade500,
-                  ),
+                  Icon(Icons.info_outline, size: 18, color: _textHintColor),
                   const SizedBox(width: 8),
                   Text(
                     "Zrzuty ekranu nie będą honorowane na bramce.",
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    style: TextStyle(color: _textHintColor, fontSize: 13),
                   ),
                 ],
               ),

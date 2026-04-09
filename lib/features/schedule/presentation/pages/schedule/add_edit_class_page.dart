@@ -43,7 +43,13 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   late TextEditingController _categoryController;
   ClassLevel _classLevel = ClassLevel.allLevels;
 
-  // Domyślnie pokazujemy pełną godzinę przy tworzeniu zajęć
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   DateTime _selectedDate = DateTime.now();
   DateTime now = DateTime.now();
   late DateTime roundedNextHour = DateTime(
@@ -101,6 +107,19 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       locale: const Locale('pl'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: _primaryColor,
+              onPrimary: Colors.black,
+              surface: _surfaceColor,
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) setState(() => _selectedDate = picked);
   }
@@ -112,7 +131,17 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.dark(
+                primary: _primaryColor,
+                onPrimary: Colors.black,
+                surface: _surfaceColor,
+                onSurface: Colors.white,
+              ),
+            ),
+            child: child!,
+          ),
         );
       },
     );
@@ -165,98 +194,132 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
         if (state is ScheduleOperationSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
+              content: Text(
+                state.message,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              backgroundColor: _primaryColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           );
           context.pop(true);
         }
         if (state is ScheduleError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(
+                state.message,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       },
       child: Scaffold(
+        backgroundColor: _bgColor,
         appBar: AppBar(
-          title: Text(isEditing ? "Edytuj zajęcia" : "Zaplanuj zajęcia"),
+          title: Text(
+            isEditing ? "Edytuj zajęcia" : "Zaplanuj zajęcia",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
           centerTitle: true,
+          backgroundColor: _bgColor,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildSectionTitle("Informacje podstawowe"),
-                const SizedBox(height: 10),
-                TextFormField(
+                const SizedBox(height: 12),
+                _buildInputField(
+                  label: "Nazwa zajęć",
                   controller: _nameController,
-                  decoration: _inputDecoration(
-                    "Nazwa zajęć",
-                    Icons.fitness_center,
-                  ),
+                  icon: Icons.fitness_center,
                   validator: (v) => v!.isEmpty ? "Podaj nazwę" : null,
                 ),
-                const SizedBox(height: 15),
-                TextFormField(
+                const SizedBox(height: 16),
+                _buildInputField(
+                  label: "Opis treningu",
                   controller: _descriptionController,
-                  decoration: _inputDecoration(
-                    "Opis treningu",
-                    Icons.description,
-                  ),
+                  icon: Icons.description_outlined,
                   maxLines: 4,
                   minLines: 2,
                 ),
-                const SizedBox(height: 15),
-                TextFormField(
+                const SizedBox(height: 16),
+                _buildInputField(
+                  label: "Kategoria treningu",
                   controller: _categoryController,
-                  decoration: _inputDecoration(
-                    "Kategoria treningu",
-                    Icons.category,
-                  ),
-                  maxLines: 1,
-                  minLines: 1,
+                  icon: Icons.category_outlined,
                 ),
-                const SizedBox(
-                  height: 15,
-                ), // Dodajemy odstęp od poprzedniego pola
+                const SizedBox(height: 16),
+
+                // Dropdown Poziomu
                 DropdownButtonFormField<ClassLevel>(
                   initialValue: _classLevel,
-                  // Używamy Twojej własnej metody do stylizacji!
-                  decoration: _inputDecoration(
-                    "Poziom zaawansowania",
-                    Icons.leaderboard, // Ikonka pasująca do poziomów
+                  dropdownColor: _surfaceColor,
+                  icon: Icon(Icons.keyboard_arrow_down, color: _textHintColor),
+                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                  decoration: InputDecoration(
+                    hintText: "Poziom zaawansowania",
+                    hintStyle: TextStyle(color: _textHintColor, fontSize: 15),
+                    prefixIcon: Icon(
+                      Icons.leaderboard_outlined,
+                      color: _textHintColor,
+                      size: 22,
+                    ),
+                    filled: true,
+                    fillColor: _surfaceColor,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: _borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: _borderColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: _primaryColor, width: 1.5),
+                    ),
                   ),
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.deepPurple,
-                  ),
-                  borderRadius: BorderRadius.circular(
-                    12,
-                  ), // Zaokrągla rogi rozwijanej listy
-                  dropdownColor: Colors.white, // Czyste, białe tło dla menu
-                  elevation: 4,
                   onChanged: (ClassLevel? newValue) {
                     if (newValue != null) {
-                      setState(() {
-                        _classLevel = newValue;
-                      });
+                      setState(() => _classLevel = newValue);
                     }
                   },
                   items: const [
                     DropdownMenuItem(
-                      value: ClassLevel.advanced,
-                      child: Text("Zaawansowany"),
+                      value: ClassLevel.beginner,
+                      child: Text("Początkujący"),
                     ),
                     DropdownMenuItem(
                       value: ClassLevel.intermediate,
                       child: Text("Średnio zaawansowany"),
                     ),
                     DropdownMenuItem(
-                      value: ClassLevel.beginner,
-                      child: Text("Początkujący"),
+                      value: ClassLevel.advanced,
+                      child: Text("Zaawansowany"),
                     ),
                     DropdownMenuItem(
                       value: ClassLevel.allLevels,
@@ -265,19 +328,19 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   ],
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: 32),
                 _buildSectionTitle("Termin"),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: _buildPickerCard(
-                        icon: Icons.calendar_today,
+                        icon: Icons.calendar_today_outlined,
                         label: DateFormat('dd.MM.yyyy').format(_selectedDate),
                         onTap: _pickDate,
                       ),
                     ),
-                    const SizedBox(width: 15),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _buildPickerCard(
                         icon: Icons.access_time,
@@ -288,27 +351,26 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   ],
                 ),
 
-                const SizedBox(height: 25),
-                _buildSectionTitle("Szczegóły"),
-                const SizedBox(height: 10),
+                const SizedBox(height: 32),
+                _buildSectionTitle("Szczegóły logistyczne"),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
-                      child: TextFormField(
+                      child: _buildInputField(
+                        label: "Czas (min)",
                         controller: _durationController,
-                        decoration: _inputDecoration("Czas (min)", Icons.timer),
+                        icon: Icons.timer_outlined,
                         keyboardType: TextInputType.number,
                         validator: (v) => v!.isEmpty ? "Wymagane" : null,
                       ),
                     ),
-                    const SizedBox(width: 15),
+                    const SizedBox(width: 16),
                     Expanded(
-                      child: TextFormField(
+                      child: _buildInputField(
+                        label: "Limit osób",
                         controller: _capacityController,
-                        decoration: _inputDecoration(
-                          "Limit osób",
-                          Icons.people,
-                        ),
+                        icon: Icons.people_outline,
                         keyboardType: TextInputType.number,
                         validator: (v) => v!.isEmpty ? "Wymagane" : null,
                       ),
@@ -316,29 +378,31 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
                 SizedBox(
                   width: double.infinity,
-                  height: 55,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                      elevation: 3,
+                      backgroundColor: _primaryColor,
+                      foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                      elevation: 8,
+                      shadowColor: _primaryColor.withValues(alpha: 0.4),
                     ),
                     child: Text(
                       isEditing ? "Zapisz zmiany" : "Utwórz zajęcia",
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -347,28 +411,63 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: Colors.deepPurple.shade300),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      filled: true,
-      fillColor: Colors.grey.shade50,
-    );
-  }
-
   Widget _buildSectionTitle(String title) {
     return Text(
-      title.toUpperCase(),
+      title,
       style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.bold,
-        color: Colors.grey.shade600,
+        color: _textHintColor,
+        letterSpacing: 0.5,
       ),
+    );
+  }
+
+  // Ujednolicony input do formularza z ikoną w środku
+  Widget _buildInputField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    int maxLines = 1,
+    int minLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      minLines: minLines,
+      style: const TextStyle(color: Colors.white, fontSize: 15),
+      cursorColor: _primaryColor,
+      decoration: InputDecoration(
+        hintText: label,
+        hintStyle: TextStyle(color: _textHintColor, fontSize: 15),
+        filled: true,
+        fillColor: _surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        prefixIcon: Icon(icon, color: _textHintColor, size: 22),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: _borderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: _borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: _primaryColor, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+        ),
+      ),
+      validator: validator,
     );
   }
 
@@ -379,21 +478,27 @@ class _AddEditClassViewState extends State<_AddEditClassView> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: Colors.black.withValues(
+            alpha: 0.2,
+          ), // Wklęsły efekt dla przycisku wyboru
+          border: Border.all(color: _borderColor),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.deepPurple),
-            const SizedBox(height: 5),
+            Icon(icon, color: _primaryColor, size: 24),
+            const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.white,
+              ),
             ),
           ],
         ),

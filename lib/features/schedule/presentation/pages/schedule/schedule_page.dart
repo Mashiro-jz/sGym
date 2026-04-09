@@ -35,12 +35,21 @@ class _SchedulePageView extends StatefulWidget {
 
 class _SchedulePageViewState extends State<_SchedulePageView> {
   DateTime _selectedDate = DateTime.now();
-  List<String> _selectedFilters = []; // Lista przechowująca zaznaczone filtry
+  List<String> _selectedFilters = [];
   final List<String> _allAvailableFilters = ClassLevel.values
       .map((e) => e.displayName)
       .toList();
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   void _openFilterDelegate() async {
+    // Uwaga: Komponent FilterListDialog ma własne stylowanie. Jeśli będzie za jasny,
+    // warto napisać własny (np. BottomSheet) w przyszłości, ale na razie go zostawiamy.
     await FilterListDialog.display<String>(
       context,
       listData: _allAvailableFilters,
@@ -48,15 +57,12 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
       headlineText: "Filtruj poziomy",
       applyButtonText: "Zatwierdź",
       choiceChipLabel: (filter) => filter,
-
       validateSelectedItem: (list, item) {
         return list != null && list.contains(item);
       },
-
       onItemSearch: (filter, query) {
         return filter.toLowerCase().contains(query.toLowerCase());
       },
-
       onApplyButtonClick: (list) {
         setState(() {
           _selectedFilters = list != null ? List.from(list) : [];
@@ -77,6 +83,20 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       locale: const Locale('pl'),
+      builder: (context, child) {
+        // Kolorowanie kalendarza pod styl Dark Fitness
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: _primaryColor, // Kolor wybranej daty
+              onPrimary: Colors.black, // Kolor tekstu na wybranej dacie
+              surface: _surfaceColor, // Tło kalendarza
+              onSurface: Colors.white, // Tekst dat w kalendarzu
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (newDate != null) {
@@ -99,28 +119,40 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: _bgColor,
       appBar: AppBar(
+        backgroundColor: _bgColor,
+        elevation: 0,
         title: InkWell(
           onTap: _pickDate,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Grafik zajęć", style: TextStyle(fontSize: 16)),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    DateFormat('EEEE, d MMMM', 'pl').format(_selectedDate),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Grafik zajęć",
+                  style: TextStyle(fontSize: 14, color: _textHintColor),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      DateFormat('EEEE, d MMMM', 'pl').format(_selectedDate),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.arrow_drop_down),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down, color: _primaryColor),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -142,22 +174,30 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Poczekaj na załadowanie danych..."),
+                  SnackBar(
+                    content: const Text(
+                      "Poczekaj na załadowanie danych...",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    backgroundColor: Colors.orangeAccent,
+                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               }
             },
-            icon: const Icon(Icons.history),
+            icon: Icon(Icons.history, color: _textHintColor),
             tooltip: "Zajęcia zakończone",
           ),
           IconButton(
             onPressed: () => _openFilterDelegate(),
             icon: Stack(
               children: [
-                // TODO: Przetestuj filtrowanie oraz niech Ci chat wytłumaczy wszystko oraz nauczy korzystać z dokumentacji i gdzie ją znaleźć
-                const Icon(Icons.filter_alt_outlined),
-                // Mała czerwona kropka, jeśli jakiś filtr jest aktywny!
+                Icon(
+                  Icons.filter_alt_outlined,
+                  color: _selectedFilters.isNotEmpty
+                      ? _primaryColor
+                      : _textHintColor,
+                ),
                 if (_selectedFilters.isNotEmpty)
                   Positioned(
                     right: 0,
@@ -165,7 +205,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                     child: Container(
                       padding: const EdgeInsets.all(1),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: Colors.redAccent,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       constraints: const BoxConstraints(
@@ -178,6 +218,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             ),
             tooltip: "Filtruj zajęcia",
           ),
+          const SizedBox(width: 8),
         ],
       ),
       floatingActionButton: isTrainerOrAdmin
@@ -188,10 +229,16 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                   context.read<ScheduleCubit>().loadSchedule(_selectedDate);
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text("Dodaj zajęcia"),
-              backgroundColor: Colors.deepPurple,
-              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add, color: Colors.black),
+              label: const Text(
+                "Dodaj zajęcia",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              backgroundColor: _primaryColor, // Neonowy guzik dla Trenera!
+              elevation: 8,
             )
           : null,
       body: BlocConsumer<ScheduleCubit, ScheduleState>(
@@ -199,23 +246,36 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
           if (state is ScheduleOperationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
+                content: Text(
+                  state.message,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                backgroundColor: _primaryColor,
+                behavior: SnackBarBehavior.floating,
               ),
             );
           }
           if (state is ScheduleError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
+                content: Text(
+                  state.message,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                backgroundColor: Colors.redAccent,
+                behavior: SnackBarBehavior.floating,
               ),
             );
           }
         },
         builder: (context, state) {
           if (state is ScheduleLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: _primaryColor),
+            );
           } else if (state is ScheduleLoaded) {
             var upComingClasses = state.classes.where((gymClass) {
               return gymClass.startTime.isAfter(DateTime.now());
@@ -236,16 +296,40 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
 
             if (upComingClasses.isEmpty) {
               return _selectedFilters.isNotEmpty
-                  ? const Center(
-                      child: Text("Brak zajęć dla podanych filtrów."),
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: _textHintColor,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "Brak zajęć",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Nie znaleziono wyników dla tych filtrów.",
+                            style: TextStyle(color: _textHintColor),
+                          ),
+                        ],
+                      ),
                     )
                   : _buildEmptyState();
             }
 
-            // TUTEJ BYŁ BŁĄD! Zwracałeś text "Wczytywanie..." zamiast listy kafelków!
-            // Przywrócona funkcja renderowania:
             return ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ), // Szersze marginesy jak na Mockupie
               itemCount: upComingClasses.length,
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
@@ -262,7 +346,12 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             );
           }
 
-          return const Center(child: Text("Wystąpił błąd wczytywania."));
+          return Center(
+            child: Text(
+              "Wystąpił błąd wczytywania.",
+              style: TextStyle(color: _textHintColor),
+            ),
+          );
         },
       ),
     );
@@ -273,15 +362,20 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.weekend,
-            size: 80,
-            color: Colors.deepPurple.withValues(alpha: 0.3),
-          ),
+          Icon(Icons.weekend_outlined, size: 80, color: _borderColor),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             "Brak zajęć w tym dniu",
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 18),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Wybierz inną datę z kalendarza.",
+            style: TextStyle(color: _textHintColor, fontSize: 14),
           ),
         ],
       ),

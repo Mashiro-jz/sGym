@@ -5,13 +5,12 @@ class ModernInfoChip extends StatelessWidget {
   final String label;
   final Color color;
 
-  // POPRAWIONY KONSTRUKTOR:
-  // icon i label są pozycyjne (bez klamerek), a color jest nazwany (w klamerkach) z domyślną wartością
   const ModernInfoChip(
     this.icon,
     this.label, {
     super.key,
-    this.color = Colors.grey,
+    // Domyślnie używamy naszego szaro-zielonego koloru (pasuje do ciemnego motywu)
+    this.color = const Color(0xFF8B9D90),
   });
 
   @override
@@ -19,9 +18,13 @@ class ModernInfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withValues(
+          alpha: 0.15,
+        ), // Nieco mocniejsze tło dla lepszego kontrastu
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ), // Delikatna ramka
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -33,7 +36,9 @@ class ModernInfoChip extends StatelessWidget {
             style: TextStyle(
               color: color,
               fontSize: 11,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight
+                  .w900, // Mocniejsze pogrubienie w stylu Dark Fitness
+              letterSpacing: 0.3,
             ),
           ),
         ],

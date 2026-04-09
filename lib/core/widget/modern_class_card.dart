@@ -24,24 +24,40 @@ class ModernClassCard extends StatelessWidget {
     required this.selectedDate,
   });
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   void _deleteClass(BuildContext context, String classId) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Usuń zajęcia"),
-        content: const Text("Nie będzie można tego cofnąć."),
+        backgroundColor: _surfaceColor, // Ciemne tło dialogu
+        title: const Text(
+          "Usuń zajęcia",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "Nie będzie można tego cofnąć.",
+          style: TextStyle(color: _textHintColor),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Anuluj"),
+            child: Text("Anuluj", style: TextStyle(color: _textHintColor)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<ScheduleCubit>().deleteClass(classId);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text("Usuń"),
+            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            child: const Text(
+              "Usuń",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -74,20 +90,26 @@ class ModernClassCard extends StatelessWidget {
           ),
         );
       },
+      borderRadius: BorderRadius.circular(20), // Zaokrąglenie efektu tapnięcia
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: _surfaceColor,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              blurRadius: 10,
+              color: isRegistered
+                  ? _primaryColor.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.2),
+              blurRadius: isRegistered ? 15 : 10,
               offset: const Offset(0, 4),
             ),
           ],
           border: isRegistered
-              ? Border.all(color: Colors.green.shade300, width: 2)
-              : null,
+              ? Border.all(
+                  color: _primaryColor.withValues(alpha: 0.6),
+                  width: 1.5,
+                )
+              : Border.all(color: _borderColor),
         ),
         child: IntrinsicHeight(
           child: Row(
@@ -95,13 +117,15 @@ class ModernClassCard extends StatelessWidget {
             children: [
               // --- LEWA STRONA: CZAS ---
               Container(
-                width: 80,
+                width: 85, // Nieco szerszy dla lepszych proporcji
                 decoration: BoxDecoration(
                   color: hasStarted
-                      ? Colors.grey.shade200
-                      : Colors.deepPurple.shade50,
+                      ? Colors.black.withValues(alpha: 0.1) // Wyszarzone
+                      : Colors.black.withValues(
+                          alpha: 0.25,
+                        ), // Wklęsły, ciemny kolor
                   borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(16),
+                    left: Radius.circular(20),
                   ),
                 ),
                 child: Column(
@@ -111,17 +135,18 @@ class ModernClassCard extends StatelessWidget {
                       startTimeStr,
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: hasStarted ? Colors.grey : Colors.deepPurple,
+                        fontWeight: FontWeight.w900,
+                        color: hasStarted ? _textHintColor : Colors.white,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       endTimeStr,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: hasStarted
-                            ? Colors.grey
-                            : Colors.deepPurple.shade300,
+                            ? Colors.grey.shade700
+                            : _textHintColor,
                       ),
                     ),
                   ],
@@ -131,7 +156,7 @@ class ModernClassCard extends StatelessWidget {
               // --- PRAWA STRONA: SZCZEGÓŁY ---
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -144,82 +169,92 @@ class ModernClassCard extends StatelessWidget {
                               gymClass.name,
                               style: const TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w900, // Gruba czcionka
+                                color: Colors.white,
+                                letterSpacing: -0.5,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (isRegistered)
-                            const Icon(
+                            Icon(
                               Icons.check_circle,
-                              color: Colors.green,
+                              color: _primaryColor, // Neonowy tick
                               size: 20,
                             ),
                         ],
                       ),
                       const SizedBox(height: 6),
 
-                      // Opis
+                      // Opis (krótki)
                       if (gymClass.description.isNotEmpty)
                         Text(
                           gymClass.description,
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: Colors.grey.shade500,
                             fontSize: 13,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
 
                       // Tagi (Chips)
                       Wrap(
                         spacing: 8,
-                        runSpacing: 4,
+                        runSpacing: 8,
                         children: [
                           ModernInfoChip(
-                            // Zaktualizowana nazwa Twojej klasy Chipa
                             Icons.timer_outlined,
                             "${gymClass.durationMinutes} min",
+                            color: _textHintColor,
                           ),
                           ModernInfoChip(
                             Icons.people_outline,
                             isFull ? "Pełne" : "$placesLeft wolnych",
                             color: isFull
-                                ? Colors.red
+                                ? Colors.redAccent
                                 : (placesLeft < 3
-                                      ? Colors.orange
-                                      : Colors.grey),
+                                      ? Colors.orangeAccent
+                                      : _textHintColor),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 12),
-                      const Divider(),
+                      const SizedBox(height: 16),
+                      Divider(color: _borderColor, height: 1),
+                      const SizedBox(height: 16),
 
-                      // Przyciski akcji
+                      // Przyciski akcji i instruktor
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Instruktor
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 16,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                trainerName,
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
+                          Expanded(
+                            // Używamy Expanded, żeby napis trenera nie wypchnął przycisków
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  size: 16,
+                                  color: _textHintColor,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    trainerName,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
 
                           // Przyciski Trenera lub Klienta
@@ -227,9 +262,9 @@ class ModernClassCard extends StatelessWidget {
                             Row(
                               children: [
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.edit_outlined,
-                                    color: Colors.blue,
+                                    color: Colors.blue.shade400,
                                   ),
                                   onPressed: () async {
                                     await context.push(
@@ -247,7 +282,7 @@ class ModernClassCard extends StatelessWidget {
                                 IconButton(
                                   icon: const Icon(
                                     Icons.delete_outline,
-                                    color: Colors.red,
+                                    color: Colors.redAccent,
                                   ),
                                   onPressed: () =>
                                       _deleteClass(context, gymClass.id),
