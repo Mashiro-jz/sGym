@@ -48,15 +48,73 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
   final Color _textHintColor = const Color(0xFF8B9D90);
 
   void _openFilterDelegate() async {
-    // Uwaga: Komponent FilterListDialog ma własne stylowanie. Jeśli będzie za jasny,
-    // warto napisać własny (np. BottomSheet) w przyszłości, ale na razie go zostawiamy.
     await FilterListDialog.display<String>(
       context,
       listData: _allAvailableFilters,
       selectedListData: _selectedFilters,
       headlineText: "Filtruj poziomy",
       applyButtonText: "Zatwierdź",
+      resetButtonText: "Wyczyść",
+      allButtonText: "Wszystkie", // Polskie tłumaczenie dla "All"
+      selectedItemsText: "wybranych", // Polskie tłumaczenie
+      hideSelectedTextCount:
+          true, // Ukrywa szary, nieczytelny tekst "0 wybranych" z paczki, dając ultra-czysty wygląd!
       choiceChipLabel: (filter) => filter,
+
+      // --- STYL DLA FILTRÓW W KLIMACIE DARK FITNESS ---
+      themeData: FilterListThemeData(
+        context,
+        backgroundColor: _surfaceColor,
+        headerTheme: HeaderThemeData(
+          backgroundColor: _surfaceColor,
+          headerTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          searchFieldBackgroundColor: _bgColor,
+          searchFieldTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 18, // Warto upewnić się, że rozmiar jest zdefiniowany
+            height:
+                1.8, // Ten parametr kontroluje wysokość linii i pomaga wycentrować tekst w pionie
+          ),
+          searchFieldHintTextStyle: TextStyle(color: _textHintColor),
+          searchFieldIconColor: _textHintColor,
+          closeIconColor: Colors.white,
+          searchFieldHintText: 'Szukaj...',
+        ),
+
+        controlButtonBarTheme: ControlButtonBarThemeData(
+          context,
+          backgroundColor: _surfaceColor,
+          controlButtonTheme: ControlButtonThemeData(
+            primaryButtonBackgroundColor: _primaryColor,
+            textStyle: TextStyle(
+              color: _primaryColor, // Kolor dla przycisku 'Wyczyść'
+              fontWeight: FontWeight.bold,
+            ),
+            primaryButtonTextStyle: const TextStyle(
+              color: Colors.black, // Kolor dla głównego przycisku 'Zatwierdź'
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        choiceChipTheme: ChoiceChipThemeData(
+          backgroundColor: _bgColor,
+          selectedBackgroundColor: _primaryColor,
+          textStyle: const TextStyle(color: Colors.white, fontSize: 14),
+          selectedTextStyle: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: _textHintColor.withValues(alpha: 0.5)),
+          ),
+        ),
+      ),
+
       validateSelectedItem: (list, item) {
         return list != null && list.contains(item);
       },
@@ -88,10 +146,10 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.dark(
-              primary: _primaryColor, // Kolor wybranej daty
-              onPrimary: Colors.black, // Kolor tekstu na wybranej dacie
-              surface: _surfaceColor, // Tło kalendarza
-              onSurface: Colors.white, // Tekst dat w kalendarzu
+              primary: _primaryColor,
+              onPrimary: Colors.black,
+              surface: _surfaceColor,
+              onSurface: Colors.white,
             ),
           ),
           child: child!,
@@ -177,9 +235,12 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                   SnackBar(
                     content: const Text(
                       "Poczekaj na załadowanie danych...",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                    backgroundColor: Colors.orangeAccent,
+                    backgroundColor: _primaryColor,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -237,7 +298,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              backgroundColor: _primaryColor, // Neonowy guzik dla Trenera!
+              backgroundColor: _primaryColor,
               elevation: 8,
             )
           : null,
@@ -281,7 +342,6 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               return gymClass.startTime.isAfter(DateTime.now());
             }).toList();
 
-            // Aplikujemy wybrane filtry
             if (_selectedFilters.isNotEmpty) {
               upComingClasses = upComingClasses.where((gymClass) {
                 final hasCategory = _selectedFilters.contains(
@@ -326,10 +386,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
             }
 
             return ListView.separated(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 16,
-              ), // Szersze marginesy jak na Mockupie
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               itemCount: upComingClasses.length,
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {

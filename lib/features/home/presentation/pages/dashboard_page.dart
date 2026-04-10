@@ -48,12 +48,12 @@ class _DashboardViewState extends State<DashboardView> {
             fontSize: 18,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            // TODO: Otwarcie bocznego menu (jeśli planujesz)
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.menu, color: Colors.white),
+        //   onPressed: () {
+        //     // TODO: Otwarcie bocznego menu (jeśli planujesz)
+        //   },
+        // ),
         actions: [
           Stack(
             alignment: Alignment.center,

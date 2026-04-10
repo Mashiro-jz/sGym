@@ -16,6 +16,9 @@ class ModernUserAvatar extends StatelessWidget {
     this.fontSize = 16.0,
   });
 
+  // --- KOLOR Z NASZEGO MOTYWU ---
+  final Color _primaryColor = const Color(0xFF00E676);
+
   @override
   Widget build(BuildContext context) {
     // Bezpieczne pobieranie inicjałów (zapobiega błędom, gdy string jest pusty)
@@ -25,8 +28,10 @@ class ModernUserAvatar extends StatelessWidget {
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Colors.white, // Czysta biel z mockupu
-      foregroundColor: Colors.deepPurple, // Fioletowe litery z mockupu
+      // Półprzezroczyste neonowe tło (idealnie stapia się z ciemnymi panelami)
+      backgroundColor: _primaryColor.withValues(alpha: 0.15),
+      // Jaskrawy, neonowy tekst
+      foregroundColor: _primaryColor,
       backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
       child: photoUrl == null
           ? Text(
@@ -34,7 +39,8 @@ class ModernUserAvatar extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w900, // Mocne pogrubienie
                 fontSize: fontSize,
-                letterSpacing: 0.5,
+                letterSpacing:
+                    1.0, // Lekko rozsunięte litery dla lepszego efektu
               ),
             )
           : null,

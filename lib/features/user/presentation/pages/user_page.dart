@@ -17,192 +17,228 @@ import '../../../auth/presentation/cubit/auth_state.dart';
 class UserProfile extends StatelessWidget {
   const UserProfile({super.key});
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
 
     if (authState is! Authenticated) {
-      return const Scaffold(
-        body: Center(child: Text("Błąd: Nie jesteś zalogowany.")),
+      return Scaffold(
+        backgroundColor: _bgColor,
+        body: Center(
+          child: Text(
+            "Błąd: Nie jesteś zalogowany.",
+            style: TextStyle(color: _textHintColor),
+          ),
+        ),
       );
     }
 
     final user = authState.user;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: _bgColor,
       appBar: AppBar(
         title: const Text(
           "Twój Profil",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        backgroundColor: _bgColor,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: const [LoginOutButton(), SizedBox(width: 10)],
       ),
       body: BlocProvider(
         create: (_) => di.sl<ScheduleCubit>()..loadUserClasses(user.id),
-        child: Column(
-          children: [
-            // --- CZĘŚĆ GÓRNA: DANE UŻYTKOWNIKA ---
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              child: Column(
-                children: [
-                  ModernUserAvatar(
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    photoUrl: user.photoUrl,
-                    radius: 46,
-                    fontSize: 32,
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    "${user.firstName} ${user.lastName}",
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black87,
+        // DODANO: SingleChildScrollView dla całego ekranu profilu
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // --- CZĘŚĆ GÓRNA: DANE UŻYTKOWNIKA ---
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10,
+                ),
+                child: Column(
+                  children: [
+                    ModernUserAvatar(
+                      firstName: user.firstName,
+                      lastName: user.lastName,
+                      photoUrl: user.photoUrl,
+                      radius: 46,
+                      fontSize: 32,
                     ),
-                  ),
+                    const SizedBox(height: 16),
 
-                  const SizedBox(height: 6),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: user.userRole.color,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      user.userRole.value,
+                    Text(
+                      "${user.firstName} ${user.lastName}",
                       style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 8),
 
-                  // Przyciski akcji (DODANO HISTORIĘ)
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      if (user.userRole == UserRole.manager)
-                        _buildActionButton(
-                          context: context,
-                          icon: Icons.admin_panel_settings_outlined,
-                          label: "Panel",
-                          onTap: () => context.push('/admin'),
-                        ),
-                      if (user.userRole == UserRole.trainer)
-                        _buildActionButton(
-                          context: context,
-                          icon: Icons.person_outline,
-                          label: "Trener",
-                          onTap: () => context.push('/trainer'),
-                        ),
-                      //TODO: PODPIĄC NOWY EKRAN
-                      _buildActionButton(
-                        context: context,
-                        icon: Icons.history, // Ikona historii
-                        label: "Historia",
-                        onTap: () => context.push(
-                          '/history',
-                        ), // Tu podepniesz nowy ekran!
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
                       ),
-                      _buildActionButton(
-                        context: context,
-                        icon: Icons.settings_outlined,
-                        label: "Ustawienia",
-                        onTap: () => context.push('/user/settings'),
+                      decoration: BoxDecoration(
+                        color: user.userRole.color.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: user.userRole.color.withValues(alpha: 0.5),
+                        ),
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade100),
+                      child: Text(
+                        user.userRole.value.toUpperCase(),
+                        style: TextStyle(
+                          color: user.userRole.color,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
                     ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
+
+                    const SizedBox(height: 32),
+
+                    // Przyciski akcji
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 12,
                       children: [
-                        _buildCompactInfoRow(Icons.email_outlined, user.email),
-                        Divider(height: 24, color: Colors.grey.shade200),
-                        _buildCompactInfoRow(
-                          Icons.phone_outlined,
-                          user.phoneNumber,
+                        if (user.userRole == UserRole.manager)
+                          _buildActionButton(
+                            context: context,
+                            icon: Icons.admin_panel_settings_outlined,
+                            label: "Panel",
+                            onTap: () => context.push('/admin'),
+                          ),
+                        if (user.userRole == UserRole.trainer)
+                          _buildActionButton(
+                            context: context,
+                            icon: Icons.fitness_center,
+                            label: "Trener",
+                            onTap: () => context.push('/trainer'),
+                          ),
+                        _buildActionButton(
+                          context: context,
+                          icon: Icons.history,
+                          label: "Historia",
+                          onTap: () => context.push('/history'),
                         ),
-                        Divider(height: 24, color: Colors.grey.shade200),
-                        _buildCompactInfoRow(
-                          Icons.person_outline,
-                          user.sexRole.displayName,
+                        _buildActionButton(
+                          context: context,
+                          icon: Icons.settings_outlined,
+                          label: "Ustawienia",
+                          onTap: () => context.push('/user/settings'),
                         ),
                       ],
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 32),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: _surfaceColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: _borderColor),
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          _buildCompactInfoRow(
+                            Icons.email_outlined,
+                            user.email,
+                          ),
+                          Divider(height: 24, color: _borderColor),
+                          _buildCompactInfoRow(
+                            Icons.phone_outlined,
+                            user.phoneNumber,
+                          ),
+                          Divider(height: 24, color: _borderColor),
+                          _buildCompactInfoRow(
+                            Icons.person_outline,
+                            user.sexRole.displayName,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            Container(
-              height: 12,
-              width: double.infinity,
-              color: Colors.grey.shade50,
-            ),
+              const SizedBox(height: 16),
 
-            // --- CZĘŚĆ DOLNA: LISTA TRENINGÓW ---
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple.shade50,
-                      borderRadius: BorderRadius.circular(8),
+              // --- CZĘŚĆ DOLNA: LISTA TRENINGÓW ---
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _primaryColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _primaryColor.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.calendar_month_outlined,
+                        size: 16,
+                        color: _primaryColor,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.deepPurple,
+                    const SizedBox(width: 12),
+                    const Text(
+                      "Twoje nadchodzące treningi",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    "Twoje nadchodzące treningi",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            Expanded(
-              child: BlocConsumer<ScheduleCubit, ScheduleState>(
+              // USUNIĘTO: Widżet Expanded nie jest potrzebny wewnątrz ScrollView
+              BlocConsumer<ScheduleCubit, ScheduleState>(
                 listener: (context, state) {
                   if (state is ScheduleOperationSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Colors.green,
+                        content: Text(
+                          state.message,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        backgroundColor: _primaryColor,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     );
                     context.read<ScheduleCubit>().loadUserClasses(user.id);
@@ -210,21 +246,28 @@ class UserProfile extends StatelessWidget {
                   if (state is ScheduleError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Colors.red,
+                        content: Text(
+                          state.message,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: Colors.redAccent,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     );
                   }
                 },
                 builder: (context, state) {
                   if (state is ScheduleLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.deepPurple,
+                    return Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Center(
+                        child: CircularProgressIndicator(color: _primaryColor),
                       ),
                     );
                   } else if (state is ScheduleLoaded) {
-                    // DODANO: Filtrowanie tylko nadchodzących zajęć + sortowanie
                     final now = DateTime.now();
                     final upcomingClasses = state.classes
                         .where((c) => c.startTime.isAfter(now))
@@ -239,8 +282,12 @@ class UserProfile extends StatelessWidget {
                     }
 
                     return ListView.builder(
+                      shrinkWrap:
+                          true, // Wymagane wewnątrz SingleChildScrollView
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Wyłącza lokalne przewijanie
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
+                        horizontal: 24,
                         vertical: 8,
                       ),
                       itemCount: upcomingClasses.length,
@@ -257,18 +304,17 @@ class UserProfile extends StatelessWidget {
                           'HH:mm',
                         ).format(gymClass.startTime);
 
-                        // ZAKTUALIZOWANY WYGLĄD: jak na flutter_06.png
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade200),
+                            color: _surfaceColor,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: _borderColor),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.02),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
@@ -285,19 +331,25 @@ class UserProfile extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
+                            highlightColor: _primaryColor.withValues(
+                              alpha: 0.1,
+                            ),
+                            splashColor: _primaryColor.withValues(alpha: 0.15),
+                            child: IntrinsicHeight(
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  // Jasnofioletowa, kwadratowa pigułka po lewej
+                                  // --- LEWA STRONA (Godzina i czas) ---
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
+                                    width: 85,
                                     decoration: BoxDecoration(
-                                      color: Colors.deepPurple.shade50,
-                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      borderRadius:
+                                          const BorderRadius.horizontal(
+                                            left: Radius.circular(20),
+                                          ),
                                     ),
                                     child: Column(
                                       mainAxisAlignment:
@@ -306,66 +358,98 @@ class UserProfile extends StatelessWidget {
                                         Text(
                                           timeStr,
                                           style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.deepPurple,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 20,
+                                            color: Colors.white,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
                                           "${gymClass.durationMinutes} min",
                                           style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.deepPurple.shade300,
+                                            fontSize: 12,
+                                            color: _textHintColor,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
 
+                                  // --- ŚRODEK (Szczegóły) ---
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          gymClass.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.black87,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            gymClass.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                              letterSpacing: -0.5,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          dateStr,
-                                          style: TextStyle(
-                                            color: Colors.grey.shade500,
-                                            fontSize: 13,
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            dateStr,
+                                            style: TextStyle(
+                                              color: _textHintColor,
+                                              fontSize: 13,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
 
-                                  // Czerwona ikona usunięcia po prawej
+                                  // --- PRAWA STRONA (Przycisk usuwania) ---
                                   IconButton(
                                     onPressed: () {
                                       showDialog(
                                         context: context,
                                         builder: (ctx) => AlertDialog(
-                                          title: const Text("Wypisać się?"),
+                                          backgroundColor: _surfaceColor,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            side: BorderSide(
+                                              color: _borderColor,
+                                            ),
+                                          ),
+                                          title: const Text(
+                                            "Wypisać się?",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                           content: Text(
                                             "Czy chcesz zrezygnować z zajęć ${gymClass.name}?",
+                                            style: TextStyle(
+                                              color: _textHintColor,
+                                            ),
                                           ),
                                           actions: [
                                             TextButton(
                                               onPressed: () =>
                                                   Navigator.pop(ctx),
-                                              child: const Text("Nie"),
+                                              child: Text(
+                                                "Nie",
+                                                style: TextStyle(
+                                                  color: _textHintColor,
+                                                ),
+                                              ),
                                             ),
-                                            TextButton(
+                                            ElevatedButton(
                                               onPressed: () {
                                                 Navigator.pop(ctx);
                                                 context
@@ -374,22 +458,37 @@ class UserProfile extends StatelessWidget {
                                                       gymClass,
                                                     );
                                               },
-                                              style: TextButton.styleFrom(
-                                                foregroundColor: Colors.red,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors
+                                                    .redAccent
+                                                    .withValues(alpha: 0.15),
+                                                foregroundColor:
+                                                    Colors.redAccent,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
                                               ),
-                                              child: const Text("Tak, wypisz"),
+                                              child: const Text(
+                                                "Tak, wypisz",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
                                       );
                                     },
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.remove_circle_outline,
-                                      color: Colors.red.shade400,
-                                      size: 28,
+                                      color: Colors.redAccent,
+                                      size: 26,
                                     ),
                                     tooltip: "Wypisz się",
                                   ),
+                                  const SizedBox(width: 8),
                                 ],
                               ),
                             ),
@@ -401,8 +500,11 @@ class UserProfile extends StatelessWidget {
                   return const SizedBox();
                 },
               ),
-            ),
-          ],
+
+              // Odstęp zabezpieczający przed wejściem pod Bottom Nav Bar
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -418,23 +520,26 @@ class UserProfile extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
+      highlightColor: _primaryColor.withValues(alpha: 0.1),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
+          color: _surfaceColor,
+          border: Border.all(color: _borderColor),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: Colors.black87),
-            const SizedBox(width: 6),
+            Icon(icon, size: 18, color: _primaryColor),
+            const SizedBox(width: 8),
             Text(
               label,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.white,
+                fontSize: 14,
               ),
             ),
           ],
@@ -446,15 +551,15 @@ class UserProfile extends StatelessWidget {
   Widget _buildCompactInfoRow(IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.grey.shade500),
-        const SizedBox(width: 12),
+        Icon(icon, size: 20, color: _textHintColor),
+        const SizedBox(width: 16),
         Expanded(
           child: Text(
             value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade800,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -464,30 +569,33 @@ class UserProfile extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.event_available,
-            size: 60,
-            color: Colors.deepPurple.withValues(alpha: 0.1),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "Brak zaplanowanych treningów",
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_available,
+              size: 64,
+              color: _textHintColor.withValues(alpha: 0.5),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            "Zapisz się w zakładce Grafik!",
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text(
+              "Brak zaplanowanych treningów",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "Zapisz się w zakładce Grafik!",
+              style: TextStyle(color: _textHintColor, fontSize: 14),
+            ),
+          ],
+        ),
       ),
     );
   }

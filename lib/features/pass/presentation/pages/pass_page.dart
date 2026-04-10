@@ -173,7 +173,7 @@ class _PassPageState extends State<PassPage>
                             blurRadius: 10,
                           ),
                         ],
-                      ),
+                      ), // TODO: zablokować możliwość robienia zrzutów ekranu (jeśli to możliwe) lub dodać duży znak wodny, aby zniechęcić do tego - ważne dla bezpieczeństwa!
                       child: Column(
                         children: [
                           if (__hasActivePass) ...[

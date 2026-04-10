@@ -40,6 +40,13 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
   SexRole? _selectedSex;
 
+  // --- PALETA KOLORÓW Z MOCKUPU ---
+  final Color _bgColor = const Color(0xFF111812);
+  final Color _surfaceColor = const Color(0xFF1E2B21);
+  final Color _primaryColor = const Color(0xFF00E676);
+  final Color _borderColor = const Color(0xFF2A3D2D);
+  final Color _textHintColor = const Color(0xFF8B9D90);
+
   void _showDeleteConfirmationDialog(BuildContext context) {
     final passwordController = TextEditingController();
 
@@ -47,14 +54,22 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          backgroundColor: _surfaceColor, // Ciemne tło dialogu
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: _borderColor),
           ),
           title: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.red.shade400),
+              const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
               const SizedBox(width: 8),
-              const Text("Usuń konto"),
+              const Text(
+                "Usuń konto",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           content: Column(
@@ -62,25 +77,42 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
             children: [
               Text(
                 "Tej operacji nie można cofnąć. Wszystkie Twoje dane zostaną trwale usunięte.",
-                style: TextStyle(color: Colors.grey.shade700),
+                style: TextStyle(color: _textHintColor),
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Aby potwierdzić, wpisz swoje hasło:",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Aby potwierdzić, wpisz swoje hasło:",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: _buildInputDecoration("Hasło", Icons.lock_outline),
+                style: const TextStyle(color: Colors.white),
+                cursorColor: Colors.redAccent,
+                decoration: _buildInputDecoration("Hasło", Icons.lock_outline)
+                    .copyWith(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: Colors.redAccent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Anuluj", style: TextStyle(color: Colors.grey)),
+              child: Text("Anuluj", style: TextStyle(color: _textHintColor)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -90,8 +122,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                 Navigator.pop(dialogContext);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade50,
-                foregroundColor: Colors.red.shade700,
+                backgroundColor: Colors.redAccent.withValues(alpha: 0.15),
+                foregroundColor: Colors.redAccent,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -166,24 +198,32 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
   }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(color: Colors.grey.shade600),
+      labelStyle: TextStyle(color: _textHintColor),
       prefixIcon: Icon(
         icon,
-        color: isReadOnly ? Colors.grey : Colors.deepPurple,
+        color: isReadOnly
+            ? _textHintColor.withValues(alpha: 0.5)
+            : _primaryColor,
       ),
       filled: true,
-      fillColor: isReadOnly ? Colors.grey.shade200 : Colors.grey.shade100,
+      fillColor: isReadOnly
+          ? Colors.black.withValues(alpha: 0.2)
+          : _surfaceColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: _borderColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: _borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+        borderSide: BorderSide(color: _primaryColor, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.red.shade300, width: 2),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
       ),
     );
   }
@@ -194,9 +234,16 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       listener: (context, state) {
         if (state is UserDataUpdateSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Profil zaktualizowany pomyślnie!"),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text(
+                "Profil zaktualizowany pomyślnie!",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              backgroundColor: _primaryColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
           context.read<AuthCubit>().checkAuthStatus();
@@ -206,7 +253,13 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
           context.read<AuthCubit>().logout();
         } else if (state is UserError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(
+                state.message,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
           );
         }
       },
@@ -214,36 +267,37 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
         final isLoading = state is UserLoading;
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: _bgColor,
           appBar: AppBar(
             title: const Text(
               "Edytuj Profil",
               style: TextStyle(
-                color: Colors.black87,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
-            backgroundColor: Colors.transparent,
+            backgroundColor: _bgColor,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.black87),
+            iconTheme: const IconThemeData(color: Colors.white),
             actions: [
               if (isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: Colors.deepPurple,
+                      color: _primaryColor,
                       strokeWidth: 2,
                     ),
                   ),
                 )
               else
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.check_circle,
-                    color: Colors.deepPurple,
+                    color: _primaryColor,
                     size: 28,
                   ),
                   onPressed: () => _saveProfile(context),
@@ -280,10 +334,11 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                               ),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
+                                  color: _primaryColor, // Neonowy zielony
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: Colors.white,
+                                    color:
+                                        _bgColor, // Tło aplikacji jako odstęp
                                     width: 4,
                                   ),
                                 ),
@@ -291,14 +346,16 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                                   icon: const Icon(
                                     Icons.camera_alt,
                                     size: 20,
-                                    color: Colors.white,
+                                    color: Colors
+                                        .black, // Czarna ikona dla kontrastu
                                   ),
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
+                                      SnackBar(
+                                        content: const Text(
                                           "Zmiana zdjęcia - wkrótce!",
                                         ),
+                                        backgroundColor: _surfaceColor,
                                       ),
                                     );
                                   },
@@ -313,7 +370,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           "Dane konta (tylko do odczytu)",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -326,7 +384,7 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                             Icons.fingerprint,
                             isReadOnly: true,
                           ),
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: _textHintColor),
                         ),
                         const SizedBox(height: 16),
 
@@ -338,7 +396,7 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                             Icons.email_outlined,
                             isReadOnly: true,
                           ),
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: _textHintColor),
                         ),
                         const SizedBox(height: 32),
 
@@ -346,13 +404,16 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           "Dane osobowe",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 16),
 
                         TextFormField(
                           controller: _firstNameController,
+                          style: const TextStyle(color: Colors.white),
+                          cursorColor: _primaryColor,
                           decoration: _buildInputDecoration(
                             "Imię",
                             Icons.person_outline,
@@ -365,6 +426,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
                         TextFormField(
                           controller: _lastNameController,
+                          style: const TextStyle(color: Colors.white),
+                          cursorColor: _primaryColor,
                           decoration: _buildInputDecoration(
                             "Nazwisko",
                             Icons.person_outline,
@@ -377,6 +440,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
                         TextFormField(
                           controller: _phoneController,
+                          style: const TextStyle(color: Colors.white),
+                          cursorColor: _primaryColor,
                           decoration: _buildInputDecoration(
                             "Telefon",
                             Icons.phone_outlined,
@@ -390,13 +455,18 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
 
                         DropdownButtonFormField<SexRole>(
                           initialValue: _selectedSex,
+                          dropdownColor: _surfaceColor,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                           decoration: _buildInputDecoration(
                             "Płeć",
                             Icons.wc_outlined,
                           ),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.keyboard_arrow_down,
-                            color: Colors.deepPurple,
+                            color: _primaryColor,
                           ),
                           items: SexRole.values.map((sex) {
                             return DropdownMenuItem(
@@ -419,29 +489,35 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                                 ? null
                                 : () => _saveProfile(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
+                              backgroundColor: _primaryColor,
+                              foregroundColor: Colors.black,
+                              elevation: 4,
+                              shadowColor: _primaryColor.withValues(alpha: 0.3),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
                             child: isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 2.5,
+                                    ),
                                   )
                                 : const Text(
                                     "Zapisz zmiany",
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w900,
                                     ),
                                   ),
                           ),
                         ),
 
                         const SizedBox(height: 40),
-                        Divider(thickness: 1, color: Colors.grey.shade200),
+                        Divider(thickness: 1, color: _borderColor),
                         const SizedBox(height: 20),
 
                         // --- SEKCJA USUWANIA KONTA ---
@@ -449,8 +525,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           "Strefa niebezpieczna",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                            fontSize: 16,
+                            color: Colors.redAccent,
+                            fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -470,9 +546,9 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              side: BorderSide(
-                                color: Colors.red.shade300,
+                              foregroundColor: Colors.redAccent,
+                              side: const BorderSide(
+                                color: Colors.redAccent,
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
@@ -487,8 +563,8 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                   ),
                 );
               }
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.deepPurple),
+              return Center(
+                child: CircularProgressIndicator(color: _primaryColor),
               );
             },
           ),
