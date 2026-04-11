@@ -3,9 +3,8 @@ import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
-// TODO: PRZETESTUJ MNIE I PRZECZYTAJ O MNIE
 
 class PassPage extends StatefulWidget {
   const PassPage({super.key});
@@ -22,6 +21,7 @@ class _PassPageState extends State<PassPage>
   final bool __hasActivePass =
       true; // Ta zmienna aktualnie jest na sztywno do przetestowania
   final int _refreshIntervalSeconds = 30; // Czas co ile tworzymy nowy kod QR
+  final noScreenShot = NoScreenshot.instance;
 
   // --- PALETA KOLORÓW Z MOCKUPU ---
   final Color _bgColor = const Color(0xFF111812);
@@ -35,6 +35,7 @@ class _PassPageState extends State<PassPage>
     super.initState();
     _generateQrData();
     _startTimer();
+    noScreenShot.screenshotOff();
   }
 
   void _generateQrData() {
@@ -72,6 +73,7 @@ class _PassPageState extends State<PassPage>
   void dispose() {
     _timer.cancel();
     super.dispose();
+    noScreenShot.screenshotOn();
   }
 
   @override
@@ -173,7 +175,7 @@ class _PassPageState extends State<PassPage>
                             blurRadius: 10,
                           ),
                         ],
-                      ), // TODO: zablokować możliwość robienia zrzutów ekranu (jeśli to możliwe) lub dodać duży znak wodny, aby zniechęcić do tego - ważne dla bezpieczeństwa!
+                      ),
                       child: Column(
                         children: [
                           if (__hasActivePass) ...[
