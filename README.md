@@ -13,6 +13,11 @@ sGym is a mobile application for managing a fitness club. It makes it easy for c
 
 ## Screenshots
 
+<img width="358" height="777" alt="flutter_01" src="https://github.com/user-attachments/assets/08784e47-f57c-4110-bb03-b1cdba53b1c7" />
+<img width="358" height="777" alt="flutter_02" src="https://github.com/user-attachments/assets/40931929-cedd-4457-aa97-fe9d3811b621" />
+<img width="358" height="777" alt="flutter_03" src="https://github.com/user-attachments/assets/bb938805-fdd9-4fa2-b638-3031d0ea96b7" />
+<img width="358" height="777" alt="flutter_04" src="https://github.com/user-attachments/assets/17b888c3-1c9f-42c4-b7ba-cfc082623606" />
+<img width="358" height="777" alt="flutter_05" src="https://github.com/user-attachments/assets/b8d7d583-8316-4198-a5a3-e39192272d72" />
 
 ## Technologies and Libraries
 
