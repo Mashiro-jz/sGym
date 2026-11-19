@@ -12,12 +12,11 @@ sGym is a mobile application for managing a fitness club. It makes it easy for c
 - Membership pass in the form of a QR code that refreshes every 30 seconds. The app blocks screenshots while the pass is displayed.
 
 ## Screenshots
-
-<img width="358" height="777" alt="flutter_01" src="https://github.com/user-attachments/assets/08784e47-f57c-4110-bb03-b1cdba53b1c7" />
-<img width="358" height="777" alt="flutter_02" src="https://github.com/user-attachments/assets/40931929-cedd-4457-aa97-fe9d3811b621" />
-<img width="358" height="777" alt="flutter_03" src="https://github.com/user-attachments/assets/bb938805-fdd9-4fa2-b638-3031d0ea96b7" />
-<img width="358" height="777" alt="flutter_04" src="https://github.com/user-attachments/assets/17b888c3-1c9f-42c4-b7ba-cfc082623606" />
-<img width="358" height="777" alt="flutter_05" src="https://github.com/user-attachments/assets/b8d7d583-8316-4198-a5a3-e39192272d72" />
+<img width="358" height="777" alt="flutter_01" src="https://github.com/user-attachments/assets/1649b2c8-13b7-403a-8b6a-2612c60bc50e" />
+<img width="358" height="777" alt="flutter_05" src="https://github.com/user-attachments/assets/7bcd2112-d3f7-4ad3-9e5d-56db2d2b21e1" />
+<img width="358" height="777" alt="flutter_04" src="https://github.com/user-attachments/assets/153a371c-1588-4fe7-99e5-a962ef4ad004" />
+<img width="358" height="777" alt="flutter_03" src="https://github.com/user-attachments/assets/8165122e-cadb-4c5b-9018-c4505512723a" />
+<img width="358" height="777" alt="flutter_02" src="https://github.com/user-attachments/assets/72a43fc6-9118-48b0-ae70-244be692bb62" />
 
 ## Technologies and Libraries
 
