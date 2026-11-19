@@ -1,4 +1,4 @@
-import 'package:agym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthState extends Equatable {
@@ -8,13 +8,13 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-// 1. Stan początkowy (np. wyświetlamy splash screen)
+// 1. Stan poczÄ…tkowy (np. wyĹ›wietlamy splash screen)
 class AuthInitial extends AuthState {}
 
-// 2. Coś się ładuje (np. kręci się kółeczko)
+// 2. CoĹ› siÄ™ Ĺ‚aduje (np. krÄ™ci siÄ™ kĂłĹ‚eczko)
 class AuthLoading extends AuthState {}
 
-// 3. Sukces - Użytkownik jest zalogowany (mamy obiekt User)
+// 3. Sukces - UĹĽytkownik jest zalogowany (mamy obiekt User)
 class Authenticated extends AuthState {
   final User user;
 
@@ -24,10 +24,10 @@ class Authenticated extends AuthState {
   List<Object?> get props => [user];
 }
 
-// 4. Użytkownik nie jest zalogowany (Gość)
+// 4. UĹĽytkownik nie jest zalogowany (GoĹ›Ä‡)
 class Unauthenticated extends AuthState {}
 
-// 5. Wystąpił błąd (np. złe hasło)
+// 5. WystÄ…piĹ‚ bĹ‚Ä…d (np. zĹ‚e hasĹ‚o)
 class AuthError extends AuthState {
   final String message;
 

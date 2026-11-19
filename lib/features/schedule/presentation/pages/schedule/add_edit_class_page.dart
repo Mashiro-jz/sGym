@@ -1,8 +1,8 @@
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/domain/enums/class_level.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/domain/enums/class_level.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_state.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';

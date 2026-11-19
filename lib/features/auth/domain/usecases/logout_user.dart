@@ -1,4 +1,4 @@
-import 'package:agym/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sgym/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUser {
   AuthRepository authRepository;

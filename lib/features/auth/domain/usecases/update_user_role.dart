@@ -1,4 +1,4 @@
-import 'package:agym/core/enums/user_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
 import '../repositories/auth_repository.dart';
 
 class UpdateUserRole {

@@ -1,5 +1,5 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/features/auth/domain/repositories/auth_repository.dart';
 
 class UpdateUserData {
   final AuthRepository repository;

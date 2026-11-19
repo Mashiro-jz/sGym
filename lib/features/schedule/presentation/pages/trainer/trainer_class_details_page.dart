@@ -1,13 +1,13 @@
-import 'package:agym/core/config/injection_container.dart';
-import 'package:agym/core/utils/sex_role_extensions.dart';
-import 'package:agym/core/utils/user_role_extensions.dart';
-import 'package:agym/features/auth/domain/entities/user.dart';
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/cubit/class_participants_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/class_participants_state.dart';
-import 'package:agym/core/widget/modern_user_avatar.dart';
-import 'package:agym/core/widget/modern_info_row.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/config/injection_container.dart';
+import 'package:sgym/core/utils/sex_role_extensions.dart';
+import 'package:sgym/core/utils/user_role_extensions.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/presentation/cubit/class_participants_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/class_participants_state.dart';
+import 'package:sgym/core/widget/modern_user_avatar.dart';
+import 'package:sgym/core/widget/modern_info_row.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -280,8 +280,8 @@ class _TrainerClassDetailsPageState extends State<TrainerClassDetailsPage> {
     );
   }
 
-  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (BOTTOM SHEET) ---
-  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (BOTTOM SHEET) ---
+  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (DOLNY PANEL) ---
+  // --- ZMODERNIZOWANY WIDOK SZCZEGÓŁÓW (DOLNY PANEL) ---
   void _showUserDetails(BuildContext context, User user) {
     showModalBottomSheet(
       context: context,

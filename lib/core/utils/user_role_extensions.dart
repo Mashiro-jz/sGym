@@ -1,11 +1,11 @@
-import 'package:agym/core/enums/user_role.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:material_ui/material_ui.dart';
 
 extension UserRoleExtensions on UserRole {
   String get displayName {
     switch (this) {
       case UserRole.manager:
-        return "Menadżer";
+        return "Menedżer";
       case UserRole.trainer:
         return "Trener";
       case UserRole.cashier:

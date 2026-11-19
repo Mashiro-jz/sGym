@@ -1,6 +1,6 @@
-import 'package:agym/core/widget/modern_class_card.dart'; // Upewnij się, że ścieżka jest poprawna!
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/widget/modern_class_card.dart'; // Upewnij się, że ścieżka jest poprawna!
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../auth/presentation/cubit/auth_cubit.dart';

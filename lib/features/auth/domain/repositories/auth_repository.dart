@@ -1,28 +1,28 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/core/enums/user_role.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
 
 import '../entities/user.dart';
 
-// To jest klasa abstrakcyjna - czyli lista wymagań.
-// Każdy mechanizm logowania (np. Firebase) musi spełniać te wymagania.
+// To jest klasa abstrakcyjna - czyli lista wymagaĹ„.
+// KaĹĽdy mechanizm logowania (np. Firebase) musi speĹ‚niaÄ‡ te wymagania.
 
 abstract class AuthRepository {
-  // Logowanie: Wymaga e-maila i hasła, zwraca Użytkownika (Entity)
+  // Logowanie: Wymaga e-maila i hasĹ‚a, zwraca UĹĽytkownika (Entity)
   Future<User> login({required String email, required String password});
 
-  // Rejestracja: Wymaga e-maila, hasła i danych użytkownika (imie, rola itp.)
-  // Zwraca utworzonego użytkownika.
+  // Rejestracja: Wymaga e-maila, hasĹ‚a i danych uĹĽytkownika (imie, rola itp.)
+  // Zwraca utworzonego uĹĽytkownika.
   Future<User> register({
     required String email,
     required String password,
-    required User user, // Przekazujemy tu obiekt z imieniem, rolą itp.
+    required User user, // Przekazujemy tu obiekt z imieniem, rolÄ… itp.
   });
 
   // Wylogowanie
   Future<void> logout();
 
-  // Sprawdzenie: Czy ktoś jest już zalogowany? (np. po restarcie apki)
-  // Zwraca User lub null (jeśli nikt nie jest zalogowany).
+  // Sprawdzenie: Czy ktoĹ› jest juĹĽ zalogowany? (np. po restarcie apki)
+  // Zwraca User lub null (jeĹ›li nikt nie jest zalogowany).
   Future<User?> getCurrentUser();
 
   Future<List<User>> getAllUsers();

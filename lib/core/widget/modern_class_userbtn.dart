@@ -1,6 +1,6 @@
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ModernUserButton extends StatelessWidget {
@@ -19,7 +19,7 @@ class ModernUserButton extends StatelessWidget {
     super.key,
   });
 
-  // --- PALETA KOLORÓW Z MOCKUPU ---
+  // --- PALETA KOLORĂ“W Z MOCKUPU ---
   final Color _primaryColor = const Color(0xFF00E676);
   final Color _textHintColor = const Color(0xFF8B9D90);
 
@@ -27,7 +27,7 @@ class ModernUserButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (hasStarted) {
       return Text(
-        "Zakończone",
+        "ZakoĹ„czone",
         style: TextStyle(
           color: _textHintColor,
           fontSize: 13,
@@ -50,7 +50,7 @@ class ModernUserButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         child: const Text(
-          "Wypisz się",
+          "Wypisz siÄ™",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       );
@@ -79,7 +79,7 @@ class ModernUserButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
       child: const Text(
-        "Zapisz się",
+        "Zapisz siÄ™",
         style: TextStyle(fontWeight: FontWeight.w900),
       ),
     );

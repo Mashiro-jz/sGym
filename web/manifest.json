@@ -1,6 +1,6 @@
 {
-    "name": "agym",
-    "short_name": "agym",
+    "name": "sgym",
+    "short_name": "sgym",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

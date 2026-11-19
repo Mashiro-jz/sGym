@@ -1,6 +1,6 @@
-import 'package:agym/core/utils/user_role_extensions.dart';
-import 'package:agym/core/widget/modern_user_avatar.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/utils/user_role_extensions.dart';
+import 'package:sgym/core/widget/modern_user_avatar.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/injection_container.dart' as di;
 import '../../../../core/enums/user_role.dart';
@@ -36,7 +36,7 @@ class _AdminViewState extends State<_AdminView> {
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: const Text(
-          "Admin Panel",
+          "Panel administratora",
           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,

@@ -1,6 +1,6 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/core/enums/user_role.dart';
-import 'package:agym/features/auth/domain/entities/user.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user_model.freezed.dart';

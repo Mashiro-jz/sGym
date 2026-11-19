@@ -1,4 +1,4 @@
-import 'package:agym/features/schedule/data/models/gym_class_model.dart';
+import 'package:sgym/features/schedule/data/models/gym_class_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class ScheduleRemoteDataSource {

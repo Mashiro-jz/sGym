@@ -1,5 +1,5 @@
-import 'package:agym/features/auth/presentation/pages/register_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/auth/presentation/pages/register_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Wróćmy do Twoich celów fitness.",
+                      "Wracamy do Twoich celów fitness",
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.grey.shade400,
@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                       isPassword: true,
                       validator: (value) {
                         if (value == null || value.length < 6) {
-                          return 'Hasło musi mieć min. 6 znaków';
+                          return 'Hasło musi mieć min. 6 znaków.';
                         }
                         return null;
                       },

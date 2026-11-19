@@ -1,9 +1,11 @@
-import 'package:agym/core/config/app_router.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/config/app_router.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'
+    as flutter_localizations;
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/config/injection_container.dart' as di;
@@ -20,7 +22,7 @@ void main() async {
   // 2. Inicjalizacja Dependency Injection
   await di.init();
 
-  // 3. Inicjalizacja formatowania dat dla języka polskiego
+  // 3. Inicjalizacja formatowania dat dla jÄ™zyka polskiego
   await initializeDateFormatting('pl');
 
   runApp(const MyApp());
@@ -31,14 +33,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 3. BlocProvider - Wstrzykujemy AuthCubit do całej aplikacji
+    // 3. BlocProvider - Wstrzykujemy AuthCubit do caĹ‚ej aplikacji
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => di.sl<AuthCubit>()..checkAuthStatus()),
         BlocProvider(create: (_) => di.sl<ScheduleCubit>()),
       ],
       child: MaterialApp.router(
-        title: 'sGym',
+        title: 'sgym',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -46,14 +48,14 @@ class MyApp extends StatelessWidget {
         ),
         routerConfig: appRouter,
 
-        // --- SEKJA NAPRAWIAJĄCA BŁĄD KALENDARZA ---
-        localizationsDelegates: const [
+        // --- SEKJA NAPRAWIAJÄ„CA BĹÄ„D KALENDARZA ---
+        localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
+          flutter_localizations.GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('pl'), // Obsługujemy język polski
+          Locale('pl'), // ObsĹ‚ugujemy jÄ™zyk polski
         ],
 
         // -------------------------------------------
@@ -65,7 +67,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// BRAMKA (Decyduje jaki ekran pokazać)
+// BRAMKA (Decyduje jaki ekran pokazaÄ‡)
 class AuthGate extends StatelessWidget {
   final Widget child;
 
@@ -76,8 +78,8 @@ class AuthGate extends StatelessWidget {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
-          // Jeśli jesteśmy na ekranie logowania, a user jest zalogowany -> idź do home
-          // Sprawdzamy obecną ścieżkę, żeby nie robić pętli przekierowań
+          // JeĹ›li jesteĹ›my na ekranie logowania, a user jest zalogowany -> idĹş do home
+          // Sprawdzamy obecnÄ… Ĺ›cieĹĽkÄ™, ĹĽeby nie robiÄ‡ pÄ™tli przekierowaĹ„
           final location = appRouter.routerDelegate.currentConfiguration.uri
               .toString();
           if (location == '/login' || location == '/register') {

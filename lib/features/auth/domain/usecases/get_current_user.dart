@@ -1,5 +1,5 @@
-import 'package:agym/features/auth/domain/entities/user.dart';
-import 'package:agym/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/auth/domain/repositories/auth_repository.dart';
 
 class GetCurrentUser {
   AuthRepository authRepository;

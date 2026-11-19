@@ -1,12 +1,12 @@
-import 'package:agym/features/admin/presentation/pages/admin_page.dart';
-import 'package:agym/features/home/presentation/pages/dashboard_page.dart';
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/pages/history/history_page.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/add_edit_class_page.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/schedule_page.dart';
-import 'package:agym/features/schedule/presentation/pages/trainer/trainer_page.dart';
-import 'package:agym/features/user/presentation/pages/user_settings_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/admin/presentation/pages/admin_page.dart';
+import 'package:sgym/features/home/presentation/pages/dashboard_page.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/presentation/pages/history/history_page.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/add_edit_class_page.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/schedule_page.dart';
+import 'package:sgym/features/schedule/presentation/pages/trainer/trainer_page.dart';
+import 'package:sgym/features/user/presentation/pages/user_settings_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -36,13 +36,13 @@ final GoRouter appRouter = GoRouter(
         return MainWrapper(child: child);
       },
       routes: [
-        // Zakładka 1: Home
+        // ZakĹ‚adka 1: Home
         GoRoute(
           path: '/home',
           builder: (context, state) => const DashboardView(),
         ),
         GoRoute(path: '/pass', builder: (context, state) => const PassPage()),
-        // Zakładka 2: Profil
+        // ZakĹ‚adka 2: Profil
         GoRoute(
           path: '/user',
           builder: (context, state) => const UserProfile(),
@@ -56,7 +56,7 @@ final GoRouter appRouter = GoRouter(
           path: '/user/settings',
           builder: (context, state) => const ProfileSettingsPage(),
         ),
-        // Zakładka 3: Grafik zajęć
+        // ZakĹ‚adka 3: Grafik zajÄ™Ä‡
         GoRoute(
           path: '/schedule',
           builder: (context, state) => const SchedulePage(),
@@ -68,7 +68,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/add-edit-class',
           builder: (context, state) {
-            // Odbieramy obiekt przekazany przy nawigacji (może być null)
+            // Odbieramy obiekt przekazany przy nawigacji (moĹĽe byÄ‡ null)
             final gymClass = state.extra as GymClass?;
             return AddEditClassPage(gymClass: gymClass);
           },

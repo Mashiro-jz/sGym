@@ -1,7 +1,7 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/features/auth/domain/usecases/delete_account.dart';
-import 'package:agym/features/auth/domain/usecases/update_user_data.dart';
-import 'package:agym/features/user/presentation/cubit/user_state.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/features/auth/domain/usecases/delete_account.dart';
+import 'package:sgym/features/auth/domain/usecases/update_user_data.dart';
+import 'package:sgym/features/user/presentation/cubit/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserCubit extends Cubit<UserState> {
@@ -11,7 +11,7 @@ class UserCubit extends Cubit<UserState> {
   UserCubit({required this.updateUserData, required this.deleteAccount})
     : super(UserInitial());
 
-  // Funkcja do aktualizacji danych użytkownika
+  // Funkcja do aktualizacji danych uĹĽytkownika
   Future<void> submitUserDataUpdate({
     required String uid,
     required String firstName,
@@ -34,7 +34,7 @@ class UserCubit extends Cubit<UserState> {
       ).timeout(const Duration(seconds: 10));
       emit(UserDataUpdateSuccess());
     } catch (e) {
-      emit(UserError("Nie udało się zaktualizować danych: $e"));
+      emit(UserError("Nie udaĹ‚o siÄ™ zaktualizowaÄ‡ danych: $e"));
     }
   }
 
@@ -44,7 +44,7 @@ class UserCubit extends Cubit<UserState> {
       await deleteAccount(password).timeout(const Duration(seconds: 10));
       emit(UserAccountDeleted());
     } catch (e) {
-      emit(UserError("Nie udało się usunąć konta. Sprawdź hasło. Błąd: $e"));
+      emit(UserError("Nie udaĹ‚o siÄ™ usunÄ…Ä‡ konta. SprawdĹş hasĹ‚o. BĹ‚Ä…d: $e"));
     }
   }
 }

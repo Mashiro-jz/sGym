@@ -1,10 +1,10 @@
-import 'package:agym/core/widget/modern_class_card.dart';
-import 'package:agym/features/schedule/domain/enums/class_level.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/past_classes_page.dart';
+import 'package:sgym/core/widget/modern_class_card.dart';
+import 'package:sgym/features/schedule/domain/enums/class_level.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_state.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/past_classes_page.dart';
 import 'package:filter_list/filter_list.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -95,7 +95,7 @@ class _SchedulePageViewState extends State<_SchedulePageView> {
               fontWeight: FontWeight.bold,
             ),
             primaryButtonTextStyle: const TextStyle(
-              color: Colors.black, // Kolor dla głównego przycisku 'Zatwierdź'
+              color: Colors.black, // Kolor głównego przycisku 'Zatwierdź'
               fontWeight: FontWeight.w900,
             ),
           ),

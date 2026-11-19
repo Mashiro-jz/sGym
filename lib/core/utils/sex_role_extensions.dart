@@ -1,4 +1,4 @@
-import 'package:agym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/sex_role.dart';
 
 extension SexRoleExtensions on SexRole {
   String get displayName {
@@ -8,7 +8,7 @@ extension SexRoleExtensions on SexRole {
       case SexRole.woman:
         return "Kobieta";
       case SexRole.other:
-        return "Inne";
+        return "Inna osoba";
     }
   }
 }

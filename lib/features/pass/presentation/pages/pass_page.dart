@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -145,7 +145,7 @@ class _PassPageState extends State<PassPage>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "sGym Pass",
+                          "Karnet sgym",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,

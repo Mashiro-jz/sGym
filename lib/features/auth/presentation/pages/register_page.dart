@@ -1,6 +1,7 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/core/enums/user_role.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:sgym/core/utils/sex_role_extensions.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/user.dart';
@@ -236,10 +237,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         decoration: _inputDecoration(hint: "Wybierz płeć"),
                         items: SexRole.values.map((sex) {
-                          // Pobieramy bezpośrednio przypisanego stringa (np. "Man", "Woman", "Other")
+                          // Wyświetlamy polską nazwę wybranej płci.
                           return DropdownMenuItem(
                             value: sex,
-                            child: Text(sex.value),
+                            child: Text(sex.displayName),
                           );
                         }).toList(),
                         onChanged: (val) {

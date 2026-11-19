@@ -1,7 +1,7 @@
-import 'package:agym/features/schedule/data/datasources/schedule_remote_data_source.dart';
-import 'package:agym/features/schedule/data/models/gym_class_model.dart';
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/domain/repositories/schedule_repository.dart';
+import 'package:sgym/features/schedule/data/datasources/schedule_remote_data_source.dart';
+import 'package:sgym/features/schedule/data/models/gym_class_model.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/domain/repositories/schedule_repository.dart';
 
 class ScheduleRepositoryImpl implements ScheduleRepository {
   final ScheduleRemoteDataSource dataSource;

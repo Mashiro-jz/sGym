@@ -1,9 +1,9 @@
-import 'package:agym/features/auth/domain/entities/user.dart';
-import 'package:agym/features/auth/domain/usecases/get_current_user.dart';
-import 'package:agym/features/auth/domain/usecases/login_user.dart';
-import 'package:agym/features/auth/domain/usecases/logout_user.dart';
-import 'package:agym/features/auth/domain/usecases/register_user.dart';
-import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/auth/domain/usecases/get_current_user.dart';
+import 'package:sgym/features/auth/domain/usecases/login_user.dart';
+import 'package:sgym/features/auth/domain/usecases/logout_user.dart';
+import 'package:sgym/features/auth/domain/usecases/register_user.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -19,7 +19,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this.registerUser,
   }) : super(AuthInitial());
 
-  // Funkcja 1: Sprawdź na starcie, czy ktoś jest zalogowany
+  // Funkcja 1: SprawdĹş na starcie, czy ktoĹ› jest zalogowany
   Future<void> checkAuthStatus() async {
     try {
       final user = await getCurrentUser();
@@ -60,7 +60,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       emit(Authenticated(newUser));
     } catch (e) {
-      emit(AuthError("Nie udało się zarejestrować: $e"));
+      emit(AuthError("Nie udaĹ‚o siÄ™ zarejestrowaÄ‡: $e"));
     }
   }
 

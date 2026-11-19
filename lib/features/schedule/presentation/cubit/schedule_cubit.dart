@@ -1,7 +1,7 @@
-import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
-import 'package:agym/features/auth/domain/usecases/get_trainer_name.dart';
-import 'package:agym/features/schedule/domain/usecases/get_user_schedule.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:sgym/features/auth/domain/usecases/get_trainer_name.dart';
+import 'package:sgym/features/schedule/domain/usecases/get_user_schedule.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/gym_class.dart';
 import '../../domain/usecases/create_gym_class.dart';
@@ -54,7 +54,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
 
       emit(ScheduleLoaded(classes, trainersName));
     } catch (e) {
-      emit(ScheduleError("Nie udało się pobrać grafiku: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ pobraÄ‡ grafiku: $e"));
     }
   }
 
@@ -63,10 +63,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(ScheduleLoading());
     try {
       await createGymClass(gymClass);
-      emit(const ScheduleOperationSuccess("Dodano nowe zajęcia"));
+      emit(const ScheduleOperationSuccess("Dodano nowe zajÄ™cia"));
       loadSchedule(_currentDate);
     } catch (e) {
-      emit(ScheduleError("Nie udało się dodać zajęć: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ dodaÄ‡ zajÄ™Ä‡: $e"));
     }
   }
 
@@ -75,10 +75,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(ScheduleLoading());
     try {
       await deleteGymClass(classId);
-      emit(const ScheduleOperationSuccess("Usunięto zajęcia"));
+      emit(const ScheduleOperationSuccess("UsuniÄ™to zajÄ™cia"));
       loadSchedule(_currentDate);
     } catch (e) {
-      emit(ScheduleError("Nie udało się usunąć zajęć: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ usunÄ…Ä‡ zajÄ™Ä‡: $e"));
     }
   }
 
@@ -87,10 +87,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(ScheduleLoading());
     try {
       await updateGymClass(gymClass);
-      emit(const ScheduleOperationSuccess("Zaktualizowano zajęcia."));
+      emit(const ScheduleOperationSuccess("Zaktualizowano zajÄ™cia."));
       loadSchedule(_currentDate);
     } catch (e) {
-      emit(ScheduleError("Błąd edycji: $e"));
+      emit(ScheduleError("BĹ‚Ä…d edycji: $e"));
     }
   }
 
@@ -100,12 +100,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     try {
       emit(ScheduleLoading());
       await signUpForClass(gymClass, currentUser.user.id);
-      emit(const ScheduleOperationSuccess("Zapisano na zajęcia."));
+      emit(const ScheduleOperationSuccess("Zapisano na zajÄ™cia."));
 
-      // POPRAWKA: Używamy dokładnej daty modyfikowanych zajęć!
+      // POPRAWKA: UĹĽywamy dokĹ‚adnej daty modyfikowanych zajÄ™Ä‡!
       await loadSchedule(gymClass.startTime);
     } catch (e) {
-      emit(ScheduleError("Nie udało się zapisać na zajęcia: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ zapisaÄ‡ na zajÄ™cia: $e"));
       await loadSchedule(gymClass.startTime);
     }
   }
@@ -116,11 +116,11 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     try {
       emit(ScheduleLoading());
       await signOutFromClass(gymClass, currentUser.user.id);
-      emit(const ScheduleOperationSuccess("Wypisano z zajęć."));
+      emit(const ScheduleOperationSuccess("Wypisano z zajÄ™Ä‡."));
 
       await loadSchedule(gymClass.startTime);
     } catch (e) {
-      emit(ScheduleError("Nie udało się wypisać z zajęć: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ wypisaÄ‡ z zajÄ™Ä‡: $e"));
       await loadSchedule(gymClass.startTime);
     }
   }
@@ -140,7 +140,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
 
       emit(ScheduleLoaded(classes, trainersName));
     } catch (e) {
-      emit(ScheduleError("Nie udało się pobrać Twoich zajęć: $e"));
+      emit(ScheduleError("Nie udaĹ‚o siÄ™ pobraÄ‡ Twoich zajÄ™Ä‡: $e"));
     }
   }
 }

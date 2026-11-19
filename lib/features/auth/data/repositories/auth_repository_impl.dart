@@ -1,9 +1,9 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/core/enums/user_role.dart';
-import 'package:agym/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:agym/features/auth/data/models/user_model.dart';
-import 'package:agym/features/auth/domain/entities/user.dart';
-import 'package:agym/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:sgym/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:sgym/features/auth/data/models/user_model.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;

@@ -1,9 +1,9 @@
-import 'package:agym/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:agym/features/auth/presentation/cubit/auth_state.dart';
-import 'package:agym/features/schedule/presentation/cubit/trainer_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/trainer_state.dart';
-import 'package:agym/features/schedule/presentation/pages/trainer/trainer_class_details_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:sgym/features/auth/presentation/cubit/auth_state.dart';
+import 'package:sgym/features/schedule/presentation/cubit/trainer_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/trainer_state.dart';
+import 'package:sgym/features/schedule/presentation/pages/trainer/trainer_class_details_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/injection_container.dart' as di;
 
@@ -20,9 +20,13 @@ class TrainerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
+    String? userId;
+    if (authState is Authenticated) {
+      userId = authState.user.id;
+    }
 
     // 1. Zabezpieczenie: Jeśli użytkownik nie jest zalogowany
-    if (authState is! Authenticated) {
+    if (userId == null) {
       return Scaffold(
         backgroundColor: _bgColor,
         body: Center(
@@ -43,8 +47,7 @@ class TrainerPage extends StatelessWidget {
 
     // 2. Główny widok dla zalogowanego trenera
     return BlocProvider(
-      create: (context) =>
-          di.sl<TrainerCubit>()..loadTrainerClasses(authState.user.id),
+      create: (context) => di.sl<TrainerCubit>()..loadTrainerClasses(userId!),
       child: Scaffold(
         backgroundColor: _bgColor,
         appBar: AppBar(
@@ -116,7 +119,7 @@ class TrainerPage extends StatelessWidget {
                         ),
                         onPressed: () {
                           context.read<TrainerCubit>().loadTrainerClasses(
-                            authState.user.id,
+                            userId!,
                           );
                         },
                         icon: const Icon(Icons.refresh, size: 20),
@@ -136,16 +139,14 @@ class TrainerPage extends StatelessWidget {
 
             if (state is TrainerLoaded) {
               if (state.classes.isEmpty) {
-                return _buildEmptyState(context, authState.user.id);
+                return _buildEmptyState(context, userId!);
               }
 
               return RefreshIndicator(
                 color: _primaryColor,
                 backgroundColor: _surfaceColor,
                 onRefresh: () async {
-                  context.read<TrainerCubit>().loadTrainerClasses(
-                    authState.user.id,
-                  );
+                  context.read<TrainerCubit>().loadTrainerClasses(userId!);
                 },
                 child: ListView.builder(
                   physics:

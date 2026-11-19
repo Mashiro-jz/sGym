@@ -1,5 +1,5 @@
-import 'package:agym/features/auth/domain/usecases/get_users_details.dart';
-import 'package:agym/features/schedule/presentation/cubit/class_participants_state.dart';
+import 'package:sgym/features/auth/domain/usecases/get_users_details.dart';
+import 'package:sgym/features/schedule/presentation/cubit/class_participants_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ClassParticipantsCubit extends Cubit<ClassParticipantsState> {
@@ -14,7 +14,7 @@ class ClassParticipantsCubit extends Cubit<ClassParticipantsState> {
       final users = await getUsersDetails(participantIds);
       emit(ClassParticipantsLoaded(users));
     } catch (e) {
-      emit(ClassParticipantsError("Nie udało się załadować uczestników: $e"));
+      emit(ClassParticipantsError("Nie udaĹ‚o siÄ™ zaĹ‚adowaÄ‡ uczestnikĂłw: $e"));
     }
   }
 }

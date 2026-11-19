@@ -1,8 +1,8 @@
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_state.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -41,7 +41,7 @@ class _DashboardViewState extends State<DashboardView> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          "Dashboard",
+          "Panel główny",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -269,7 +269,7 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  // GŁÓWNA KARTA (Zainspirowana "Live Status" z mockupu)
+  // GŁÓWNA KARTA (Zainspirowana statusem na żywo z makiety)
   Widget _buildNextTrainingCard(
     BuildContext context,
     GymClass gymClass,

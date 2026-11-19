@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -152,12 +152,6 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
       _phoneController = TextEditingController(text: user.phoneNumber);
       _emailController = TextEditingController(text: user.email);
       _selectedSex = user.sexRole;
-    } else {
-      _firstNameController = TextEditingController();
-      _lastNameController = TextEditingController();
-      _phoneController = TextEditingController();
-      _emailController = TextEditingController();
-      _selectedSex = SexRole.other;
     }
   }
 
@@ -380,7 +374,7 @@ class _ProfileSettingsViewState extends State<_ProfileSettingsView> {
                           initialValue: user.id,
                           readOnly: true,
                           decoration: _buildInputDecoration(
-                            "User ID",
+                            "Identyfikator użytkownika",
                             Icons.fingerprint,
                             isReadOnly: true,
                           ),

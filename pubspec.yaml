@@ -1,6 +1,6 @@
-name: agym
-description: "A new Flutter project."
-publish_to: 'none'
+name: sgym
+description: "sGym is a comprehensive mobile application developed using the Flutter framework, designed to facilitate the management of fitness centers, scheduling, and trainer-client interactions."
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -30,6 +30,8 @@ dependencies:
   no_screenshot: ^1.1.0
   qr_flutter: ^4.1.0
 
+  material_ui: any
+  cupertino_ui: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

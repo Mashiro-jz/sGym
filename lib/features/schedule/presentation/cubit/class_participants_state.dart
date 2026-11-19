@@ -1,4 +1,4 @@
-import 'package:agym/features/auth/domain/entities/user.dart';
+import 'package:sgym/features/auth/domain/entities/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ClassParticipantsState extends Equatable {

@@ -1,4 +1,4 @@
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
 
 abstract class ScheduleRepository {
   Future<List<GymClass>> getSchedule(DateTime date);

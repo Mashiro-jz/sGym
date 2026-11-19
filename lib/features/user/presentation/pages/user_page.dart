@@ -1,12 +1,12 @@
-import 'package:agym/core/enums/user_role.dart';
-import 'package:agym/core/utils/sex_role_extensions.dart';
-import 'package:agym/core/utils/user_role_extensions.dart';
-import 'package:agym/core/widget/login_out_btn.dart';
-import 'package:agym/core/widget/modern_user_avatar.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_state.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:sgym/core/utils/sex_role_extensions.dart';
+import 'package:sgym/core/utils/user_role_extensions.dart';
+import 'package:sgym/core/widget/login_out_btn.dart';
+import 'package:sgym/core/widget/modern_user_avatar.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_state.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -107,7 +107,7 @@ class UserProfile extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        user.userRole.value.toUpperCase(),
+                        user.userRole.displayName,
                         style: TextStyle(
                           color: user.userRole.color,
                           fontSize: 11,

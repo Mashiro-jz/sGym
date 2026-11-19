@@ -1,4 +1,4 @@
-import 'package:agym/features/schedule/domain/enums/class_level.dart';
+import 'package:sgym/features/schedule/domain/enums/class_level.dart';
 import 'package:equatable/equatable.dart';
 
 class GymClass extends Equatable {

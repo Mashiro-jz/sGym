@@ -1,9 +1,9 @@
-import 'package:agym/core/widget/modern_class_info.dart';
-import 'package:agym/core/widget/modern_class_userbtn.dart';
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/presentation/cubit/schedule_cubit.dart';
-import 'package:agym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
-import 'package:flutter/material.dart';
+import 'package:sgym/core/widget/modern_class_info.dart';
+import 'package:sgym/core/widget/modern_class_userbtn.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/presentation/cubit/schedule_cubit.dart';
+import 'package:sgym/features/schedule/presentation/pages/schedule/schedule_details_page.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +24,7 @@ class ModernClassCard extends StatelessWidget {
     required this.selectedDate,
   });
 
-  // --- PALETA KOLORÓW Z MOCKUPU ---
+  // --- PALETA KOLORĂ“W Z MOCKUPU ---
   final Color _surfaceColor = const Color(0xFF1E2B21);
   final Color _primaryColor = const Color(0xFF00E676);
   final Color _borderColor = const Color(0xFF2A3D2D);
@@ -34,13 +34,13 @@ class ModernClassCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: _surfaceColor, // Ciemne tło dialogu
+        backgroundColor: _surfaceColor, // Ciemne tĹ‚o dialogu
         title: const Text(
-          "Usuń zajęcia",
+          "UsuĹ„ zajÄ™cia",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          "Nie będzie można tego cofnąć.",
+          "Nie bÄ™dzie moĹĽna tego cofnÄ…Ä‡.",
           style: TextStyle(color: _textHintColor),
         ),
         actions: [
@@ -55,7 +55,7 @@ class ModernClassCard extends StatelessWidget {
             },
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
             child: const Text(
-              "Usuń",
+              "UsuĹ„",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -90,7 +90,7 @@ class ModernClassCard extends StatelessWidget {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(20), // Zaokrąglenie efektu tapnięcia
+      borderRadius: BorderRadius.circular(20), // ZaokrÄ…glenie efektu tapniÄ™cia
       child: Container(
         decoration: BoxDecoration(
           color: _surfaceColor,
@@ -123,7 +123,7 @@ class ModernClassCard extends StatelessWidget {
                       ? Colors.black.withValues(alpha: 0.1) // Wyszarzone
                       : Colors.black.withValues(
                           alpha: 0.25,
-                        ), // Wklęsły, ciemny kolor
+                        ), // WklÄ™sĹ‚y, ciemny kolor
                   borderRadius: const BorderRadius.horizontal(
                     left: Radius.circular(20),
                   ),
@@ -153,14 +153,14 @@ class ModernClassCard extends StatelessWidget {
                 ),
               ),
 
-              // --- PRAWA STRONA: SZCZEGÓŁY ---
+              // --- PRAWA STRONA: SZCZEGĂ“ĹY ---
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Tytuł i status
+                      // TytuĹ‚ i status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -187,7 +187,7 @@ class ModernClassCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
 
-                      // Opis (krótki)
+                      // Opis (krĂłtki)
                       if (gymClass.description.isNotEmpty)
                         Text(
                           gymClass.description,
@@ -213,7 +213,7 @@ class ModernClassCard extends StatelessWidget {
                           ),
                           ModernInfoChip(
                             Icons.people_outline,
-                            isFull ? "Pełne" : "$placesLeft wolnych",
+                            isFull ? "PeĹ‚ne" : "$placesLeft wolnych",
                             color: isFull
                                 ? Colors.redAccent
                                 : (placesLeft < 3
@@ -233,7 +233,7 @@ class ModernClassCard extends StatelessWidget {
                         children: [
                           // Instruktor
                           Expanded(
-                            // Używamy Expanded, żeby napis trenera nie wypchnął przycisków
+                            // UĹĽywamy Expanded, ĹĽeby napis trenera nie wypchnÄ…Ĺ‚ przyciskĂłw
                             child: Row(
                               children: [
                                 Icon(

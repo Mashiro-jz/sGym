@@ -1,6 +1,6 @@
-import 'package:agym/core/enums/sex_role.dart';
-import 'package:agym/core/enums/user_role.dart';
-import 'package:agym/features/auth/data/models/user_model.dart';
+import 'package:sgym/core/enums/sex_role.dart';
+import 'package:sgym/core/enums/user_role.dart';
+import 'package:sgym/features/auth/data/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -146,7 +146,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final user = firebaseAuth.currentUser;
 
     if (user == null) {
-      throw Exception("Użytkownik nie jest zalogowany");
+      throw Exception("UĹĽytkownik nie jest zalogowany");
     }
 
     final credential = EmailAuthProvider.credential(
@@ -161,17 +161,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await user.delete();
   }
 
-  // TODO: PRZY ZMIANIE BAZY DANYCH, PAMIĘTAĆ O TYM LIMICIE
+  // TODO: PRZY ZMIANIE BAZY DANYCH, PAMIÄTAÄ† O TYM LIMICIE
   @override
   Future<List<UserModel>> getUsersDetails(List<String> uids) async {
-    // 1. Zabezpieczenie przed pustą listą
+    // 1. Zabezpieczenie przed pustÄ… listÄ…
     if (uids.isEmpty) {
       return [];
     }
 
-    // UWAGA: Firestore whereIn ma limit 10 elementów.
-    // Jeśli przewidujesz grupy > 10 osób, trzeba to rozbić na paczki (chunks).
-    // Poniżej proste rozwiązanie biorące pierwsze 10 osób (aby uniknąć crasha):
+    // UWAGA: Firestore whereIn ma limit 10 elementĂłw.
+    // JeĹ›li przewidujesz grupy > 10 osĂłb, trzeba to rozbiÄ‡ na paczki (chunks).
+    // PoniĹĽej proste rozwiÄ…zanie biorÄ…ce pierwsze 10 osĂłb (aby uniknÄ…Ä‡ crasha):
     final safeUids = uids.length > 10 ? uids.sublist(0, 10) : uids;
 
     try {
@@ -184,7 +184,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .map((doc) => UserModel.fromJson(doc.data()))
           .toList();
     } catch (e) {
-      throw Exception("Błąd pobierania użytkowników: $e");
+      throw Exception("BĹ‚Ä…d pobierania uĹĽytkownikĂłw: $e");
     }
   }
 }

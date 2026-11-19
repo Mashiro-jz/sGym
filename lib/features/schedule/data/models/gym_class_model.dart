@@ -1,5 +1,5 @@
-import 'package:agym/features/schedule/domain/entities/gym_class.dart';
-import 'package:agym/features/schedule/domain/enums/class_level.dart';
+import 'package:sgym/features/schedule/domain/entities/gym_class.dart';
+import 'package:sgym/features/schedule/domain/enums/class_level.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,9 +11,9 @@ class TimestampConverter implements JsonConverter<DateTime, dynamic> {
 
   @override
   DateTime fromJson(dynamic json) {
-    // Jeśli z bazy przyjdzie Timestamp, zamień na DateTime
+    // JeĹ›li z bazy przyjdzie Timestamp, zamieĹ„ na DateTime
     if (json is Timestamp) return json.toDate();
-    // Jeśli przyjdzie String (stare dane), spróbuj sparsować
+    // JeĹ›li przyjdzie String (stare dane), sprĂłbuj sparsowaÄ‡
     return DateTime.parse(json as String);
   }
 
@@ -71,7 +71,7 @@ abstract class GymClassModel with _$GymClassModel {
     );
   }
 
-  // Usuwa zajęcia, po 15 dniach od rozpoczęcia
+  // Usuwa zajÄ™cia, po 15 dniach od rozpoczÄ™cia
   Map<String, dynamic> toFirestore() {
     final map = toJson();
 
